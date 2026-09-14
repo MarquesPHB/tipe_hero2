@@ -1,0 +1,6 @@
+{
+  "name": "TypeHero World - Academia de Digitação e Destreza Digital",
+  "description": "Jogo educativo e pedagógico completo para domínio do teclado ABNT2, uso correto do mouse e alfabetização digital com progressão didática, acessibilidade e efeitos sonoros.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

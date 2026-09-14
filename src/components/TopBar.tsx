@@ -1,0 +1,136 @@
+import React from 'react';
+import { AvatarConfig, Difficulty, PlayerStats } from '../types';
+import { AvatarDisplay } from './AvatarDisplay';
+import { sounds } from '../audio/soundEngine';
+import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders } from 'lucide-react';
+
+interface TopBarProps {
+  currentTab: 'world' | 'missions' | 'shop' | 'profile' | 'settings';
+  stats: PlayerStats;
+  avatar: AvatarConfig;
+  difficulty: Difficulty;
+  soundEnabled: boolean;
+  onTabChange: (tab: 'world' | 'missions' | 'shop' | 'profile' | 'settings') => void;
+  onDifficultyChange: (diff: Difficulty) => void;
+  onToggleSound: () => void;
+  onOpenAvatarEditor: () => void;
+}
+
+export const TopBar: React.FC<TopBarProps> = ({
+  currentTab,
+  stats,
+  avatar,
+  difficulty,
+  soundEnabled,
+  onTabChange,
+  onDifficultyChange,
+  onToggleSound,
+  onOpenAvatarEditor,
+}) => {
+  return (
+    <header className="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-2.5 shadow-md">
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        {/* Marca TypeHero */}
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onTabChange('world')}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 border-2 border-amber-400/80 flex items-center justify-center text-xl text-white font-bold shadow-[0_0_15px_#38bdf833]">
+            ⌨
+          </div>
+          <div>
+            <div className="text-xl font-black tracking-tight text-white leading-none">
+              Type<span className="text-amber-400">Hero</span>
+            </div>
+            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+              Academia de Destreza Digital
+            </div>
+          </div>
+        </div>
+
+        {/* Abas Principais de Navegação */}
+        <nav className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+          {[
+            { id: 'world', label: 'Mundo', icon: '🏠' },
+            { id: 'missions', label: 'Missões', icon: '🗺️' },
+            { id: 'shop', label: 'Loja', icon: '🎒' },
+            { id: 'profile', label: 'Perfil', icon: '🧑' },
+            { id: 'settings', label: 'Ajustes', icon: '⚙️' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                sounds.keyClick();
+                onTabChange(tab.id as 'world' | 'missions' | 'shop' | 'profile' | 'settings');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 ${
+                currentTab === tab.id
+                  ? 'bg-sky-500 text-slate-950 shadow-md font-extrabold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Painel do Aluno: Dificuldade + Moedas + XP + Avatar */}
+        <div className="flex items-center space-x-3">
+          {/* Seletor Rápido de Dificuldade */}
+          <div className="hidden md:flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg text-[11px]">
+            {(['easy', 'intermediate', 'hard'] as Difficulty[]).map((d) => (
+              <button
+                key={d}
+                onClick={() => onDifficultyChange(d)}
+                className={`px-2 py-1 rounded font-semibold transition ${
+                  difficulty === d
+                    ? 'bg-amber-400 text-slate-950 font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {d === 'easy' ? 'Fácil' : d === 'intermediate' ? 'Intermed.' : 'Difícil'}
+              </button>
+            ))}
+          </div>
+
+          {/* Som Toggle */}
+          <button
+            onClick={onToggleSound}
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center text-xs transition ${
+              soundEnabled
+                ? 'bg-slate-900 border-slate-700 text-sky-400 hover:text-sky-300'
+                : 'bg-slate-900 border-rose-900/50 text-rose-400'
+            }`}
+            title={soundEnabled ? 'Sons de jogo ativados' : 'Sons desativados'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
+          {/* Moedas e Gemas */}
+          <div className="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-xl text-xs font-bold">
+            <div className="flex items-center space-x-1 text-amber-400">
+              <Coins className="w-3.5 h-3.5" />
+              <span>{stats.coins}</span>
+            </div>
+            <div className="w-px h-3 bg-slate-700" />
+            <div className="flex items-center space-x-1 text-cyan-400">
+              <Gem className="w-3.5 h-3.5" />
+              <span>{stats.gems}</span>
+            </div>
+            <div className="w-px h-3 bg-slate-700" />
+            <div className="text-emerald-400 font-mono">
+              {stats.xp} <span className="text-[10px] text-slate-400">XP</span>
+            </div>
+          </div>
+
+          {/* Avatar Clicável */}
+          <button
+            onClick={onOpenAvatarEditor}
+            className="w-10 h-10 rounded-full border-2 border-amber-400 bg-slate-800 overflow-hidden shadow-md hover:scale-105 transition flex items-center justify-center cursor-pointer"
+            title="Personalizar seu Avatar"
+          >
+            <AvatarDisplay avatar={avatar} size={36} />
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+};
