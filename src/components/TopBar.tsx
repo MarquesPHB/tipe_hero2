@@ -1,8 +1,8 @@
 import React from 'react';
-import { AvatarConfig, Difficulty, PlayerStats } from '../types';
+import { AvatarConfig, Difficulty, FontSize, PlayerStats, ThemeMode } from '../types';
 import { AvatarDisplay } from './AvatarDisplay';
 import { sounds } from '../audio/soundEngine';
-import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders, Sun, Moon } from 'lucide-react';
 
 interface TopBarProps {
   currentTab: 'world' | 'missions' | 'shop' | 'profile' | 'settings';
@@ -10,10 +10,15 @@ interface TopBarProps {
   avatar: AvatarConfig;
   difficulty: Difficulty;
   soundEnabled: boolean;
+  fontSize: FontSize;
+  themeMode: ThemeMode;
   onTabChange: (tab: 'world' | 'missions' | 'shop' | 'profile' | 'settings') => void;
   onDifficultyChange: (diff: Difficulty) => void;
   onToggleSound: () => void;
   onOpenAvatarEditor: () => void;
+  onDecreaseFontSize: () => void;
+  onIncreaseFontSize: () => void;
+  onToggleTheme: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -22,10 +27,15 @@ export const TopBar: React.FC<TopBarProps> = ({
   avatar,
   difficulty,
   soundEnabled,
+  fontSize,
+  themeMode,
   onTabChange,
   onDifficultyChange,
   onToggleSound,
   onOpenAvatarEditor,
+  onDecreaseFontSize,
+  onIncreaseFontSize,
+  onToggleTheme,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-2.5 shadow-md">
@@ -90,6 +100,59 @@ export const TopBar: React.FC<TopBarProps> = ({
               </button>
             ))}
           </div>
+
+          {/* Controle Universal de Fonte: A- e A+ com indicador de escala */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 space-x-1" title="Ajuste Universal do Tamanho da Fonte">
+            <button
+              onClick={() => {
+                sounds.keyClick();
+                onDecreaseFontSize();
+              }}
+              disabled={fontSize === 'small'}
+              className="px-2 py-1 rounded-lg text-xs font-serif font-black text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition"
+              title="Diminuir tamanho da fonte de todo o jogo (A-)"
+            >
+              A−
+            </button>
+            <span className="text-[11px] font-mono font-bold text-sky-400 px-1 select-none whitespace-nowrap">
+              {fontSize === 'small'
+                ? '85%'
+                : fontSize === 'normal'
+                ? '100%'
+                : fontSize === 'large'
+                ? '120%'
+                : fontSize === 'xl'
+                ? '145%'
+                : '170%'}
+            </span>
+            <button
+              onClick={() => {
+                sounds.keyClick();
+                onIncreaseFontSize();
+              }}
+              disabled={fontSize === '2xl'}
+              className="px-2 py-1 rounded-lg text-sm font-serif font-black text-amber-400 hover:text-amber-300 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition"
+              title="Aumentar tamanho da fonte de todo o jogo (A+)"
+            >
+              A+
+            </button>
+          </div>
+
+          {/* Alternador Modo Claro / Escuro */}
+          <button
+            onClick={() => {
+              sounds.keyClick();
+              onToggleTheme();
+            }}
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center text-xs transition ${
+              themeMode === 'light'
+                ? 'bg-amber-100 border-amber-300 text-amber-700 hover:bg-amber-200'
+                : 'bg-slate-900 border-slate-700 text-amber-400 hover:text-amber-300'
+            }`}
+            title={themeMode === 'light' ? 'Mudar para Modo Noturno / Escuro' : 'Mudar para Modo Claro / Diurno'}
+          >
+            {themeMode === 'light' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
           {/* Som Toggle */}
           <button

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { sounds } from '../../audio/soundEngine';
 import confetti from 'canvas-confetti';
-import { Delete, CheckCircle, ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { Delete, CheckCircle, ArrowLeft, ArrowRight, FileText, Keyboard, Sparkles } from 'lucide-react';
 
 interface BackspaceWorkshopActivityProps {
   onComplete: (score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }) => void;
@@ -20,10 +20,10 @@ const EXERCISES: ExerciseItem[] = [
   {
     id: 1,
     corruptText: 'compputador',
-    cursorPos: 5, // entre o segundo 'p' e o 'u' -> Backspace apaga o 'p' à esquerda
+    cursorPos: 5, // entre o 2º 'p' e o 'u' -> Backspace apaga o 'p' à esquerda
     correctText: 'computador',
     requiredKey: 'Backspace',
-    explanation: 'O cursor está à direita da letra extra. Pressione BACKSPACE para apagar o "p" à esquerda!',
+    explanation: 'O cursor está à direita da letra extra "p". Pressione a tecla BACKSPACE no seu teclado!',
   },
   {
     id: 2,
@@ -31,31 +31,31 @@ const EXERCISES: ExerciseItem[] = [
     cursorPos: 4, // antes do segundo 'l' -> Delete apaga o 'l' à frente
     correctText: 'teclado',
     requiredKey: 'Delete',
-    explanation: 'O cursor está ANTES da letra extra "l". Pressione DELETE para apagar o caractere à sua frente!',
+    explanation: 'O cursor está ANTES da letra extra "l". Pressione a tecla DELETE no seu teclado para apagar à frente!',
   },
   {
     id: 3,
     corruptText: 'moouse',
-    cursorPos: 3, // depois do segundo 'o'
+    cursorPos: 3, // depois do segundo 'o' -> Backspace
     correctText: 'mouse',
     requiredKey: 'Backspace',
-    explanation: 'O cursor está após o segundo "o". Use BACKSPACE para apagar o "o" excedente à esquerda.',
+    explanation: 'O cursor está após o segundo "o". Pressione BACKSPACE no teclado para apagar à esquerda!',
   },
   {
     id: 4,
     corruptText: 'escroll',
-    cursorPos: 0, // no início da palavra
+    cursorPos: 0, // no início antes de 'e' -> Delete
     correctText: 'scroll',
     requiredKey: 'Delete',
-    explanation: 'O cursor está no começo antes da letra "e". Use DELETE para apagar a letra que está na frente!',
+    explanation: 'O cursor está no começo, antes da letra "e". Pressione a tecla DELETE no teclado!',
   },
   {
     id: 5,
     corruptText: 'digitaçãoo',
-    cursorPos: 10, // no fim da palavra
+    cursorPos: 10, // no fim da palavra após 'o' -> Backspace
     correctText: 'digitação',
     requiredKey: 'Backspace',
-    explanation: 'O cursor está no final da palavra. Pressione BACKSPACE para apagar o "o" extra.',
+    explanation: 'O cursor está no final da palavra. Pressione BACKSPACE no teclado para apagar a letra final extra!',
   },
 ];
 
@@ -65,21 +65,48 @@ export const BackspaceWorkshopActivity: React.FC<BackspaceWorkshopActivityProps>
   const [cursorPos, setCursorPos] = useState(EXERCISES[0].cursorPos);
   const [errors, setErrors] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [lastKeyPressed, setLastKeyPressed] = useState<string | null>(null);
 
   const currentExercise = EXERCISES[currentIdx];
+
+  // Global Keyboard listener for physical Backspace, Delete, and Arrow navigation!
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        setLastKeyPressed('Backspace');
+        setTimeout(() => setLastKeyPressed(null), 300);
+        handleBackspace();
+      } else if (e.key === 'Delete') {
+        e.preventDefault();
+        setLastKeyPressed('Delete');
+        setTimeout(() => setLastKeyPressed(null), 300);
+        handleDelete();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCursorPos((prev) => Math.max(0, prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCursorPos((prev) => Math.min(currentText.length, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cursorPos, currentText, currentExercise, currentIdx]);
 
   const handleBackspace = () => {
     sounds.keyClick();
     if (cursorPos === 0) {
       sounds.errorThud();
-      setFeedback('O cursor já está no início; não há nada à esquerda para apagar com Backspace.');
+      setFeedback('O cursor já está no início; não há nenhum caractere à esquerda para apagar com Backspace.');
       return;
     }
 
     if (currentExercise.requiredKey !== 'Backspace') {
       sounds.errorThud();
       setErrors((prev) => prev + 1);
-      setFeedback('Nesta posição você precisa apagar o caractere à FRENTE. Para isso use a tecla DELETE!');
+      setFeedback('Nesta posição o caractere errado está À SUA FRENTE. Pressione a tecla DELETE!');
       return;
     }
 
@@ -87,7 +114,8 @@ export const BackspaceWorkshopActivity: React.FC<BackspaceWorkshopActivityProps>
     const after = currentText.slice(cursorPos);
     const updated = before + after;
     setCurrentText(updated);
-    setCursorPos(cursorPos - 1);
+    const newPos = cursorPos - 1;
+    setCursorPos(newPos);
 
     if (updated === currentExercise.correctText) {
       advanceExercise();
@@ -98,14 +126,14 @@ export const BackspaceWorkshopActivity: React.FC<BackspaceWorkshopActivityProps>
     sounds.keyClick();
     if (cursorPos >= currentText.length) {
       sounds.errorThud();
-      setFeedback('O cursor está no final; não há nada à frente para apagar com Delete.');
+      setFeedback('O cursor está no final do texto; não há nada à frente para apagar com Delete.');
       return;
     }
 
     if (currentExercise.requiredKey !== 'Delete') {
       sounds.errorThud();
       setErrors((prev) => prev + 1);
-      setFeedback('Nesta posição você precisa apagar o caractere à ESQUERDA. Para isso use BACKSPACE!');
+      setFeedback('Nesta posição o caractere errado está ATRÁS (À ESQUERDA). Pressione a tecla BACKSPACE!');
       return;
     }
 
@@ -121,20 +149,20 @@ export const BackspaceWorkshopActivity: React.FC<BackspaceWorkshopActivityProps>
 
   const advanceExercise = () => {
     sounds.coin();
-    setFeedback('Perfeito! Palavra corrigida com a tecla exata!');
+    setFeedback('🎉 Perfeito! Você usou a tecla exata no teclado!');
 
     if (currentIdx + 1 >= EXERCISES.length) {
       sounds.victoryFanfare();
-      confetti({ particleCount: 70, spread: 60 });
+      confetti({ particleCount: 80, spread: 70 });
       setTimeout(() => {
         onComplete({
-          wpm: 25,
-          accuracy: Math.max(70, 100 - errors * 6),
+          wpm: 28,
+          accuracy: Math.max(75, 100 - errors * 5),
           errors,
-          rewardXp: 55,
-          rewardCoins: 40,
+          rewardXp: 60,
+          rewardCoins: 45,
         });
-      }, 1000);
+      }, 1200);
     } else {
       setTimeout(() => {
         const nextIdx = currentIdx + 1;
@@ -142,77 +170,130 @@ export const BackspaceWorkshopActivity: React.FC<BackspaceWorkshopActivityProps>
         setCurrentText(EXERCISES[nextIdx].corruptText);
         setCursorPos(EXERCISES[nextIdx].cursorPos);
         setFeedback(null);
-      }, 700);
+      }, 800);
     }
   };
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 max-w-2xl mx-auto">
       {/* Header com indicador pedagógico */}
-      <div className="flex items-center justify-between bg-slate-900/90 border border-slate-700/80 rounded-xl p-3">
-        <div className="flex items-center space-x-2">
-          <FileText className="w-5 h-5 text-sky-400" />
-          <span className="text-sm font-bold text-slate-200">
-            Simulador de Bloco de Notas: Exercício {currentIdx + 1} de {EXERCISES.length}
-          </span>
+      <div className="flex items-center justify-between bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 shadow-md">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-400 flex items-center justify-center">
+            <Keyboard className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-white">
+              Oficina Prática de Backspace & Delete
+            </h3>
+            <p className="text-xs text-slate-400">
+              Exercício {currentIdx + 1} de {EXERCISES.length}: use as teclas do seu teclado físico!
+            </p>
+          </div>
         </div>
-        <div className="text-xs text-slate-400">
-          Erros: <b className="text-rose-400">{errors}</b>
+        <div className="text-xs text-slate-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+          Erros: <b className="text-rose-400 font-mono">{errors}</b>
         </div>
       </div>
 
       {/* Regra Fundamental de Edição */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div className="flex items-center space-x-2 bg-rose-950/30 border border-rose-500/30 p-2.5 rounded-lg text-rose-200">
-          <ArrowLeft className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all ${
+          currentExercise.requiredKey === 'Backspace'
+            ? 'bg-rose-950/40 border-rose-500 shadow-[0_0_15px_#f43f5e33]'
+            : 'bg-slate-900/60 border-slate-800 opacity-75'
+        }`}>
+          <div className="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center font-bold">
+            ⌫
+          </div>
           <div>
-            <b>Backspace (⌫):</b> Apaga o caractere à <b>ESQUERDA</b> do cursor.
+            <b className="text-rose-300">Tecla BACKSPACE:</b>
+            <div className="text-slate-300 text-[11px]">Apaga a letra à <b>ESQUERDA</b> do cursor.</div>
           </div>
         </div>
-        <div className="flex items-center space-x-2 bg-sky-950/30 border border-sky-500/30 p-2.5 rounded-lg text-sky-200">
-          <ArrowRight className="w-4 h-4 text-sky-400 shrink-0" />
+
+        <div className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all ${
+          currentExercise.requiredKey === 'Delete'
+            ? 'bg-sky-950/40 border-sky-500 shadow-[0_0_15px_#0ea5e933]'
+            : 'bg-slate-900/60 border-slate-800 opacity-75'
+        }`}>
+          <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center font-bold">
+            Del
+          </div>
           <div>
-            <b>Delete (Del):</b> Apaga o caractere à <b>FRENTE / DIREITA</b> do cursor.
+            <b className="text-sky-300">Tecla DELETE:</b>
+            <div className="text-slate-300 text-[11px]">Apaga a letra à <b>FRENTE (DIREITA)</b> do cursor.</div>
           </div>
         </div>
       </div>
 
-      {/* Janela de Edição */}
-      <div className="bg-slate-950 border-2 border-slate-700 rounded-xl p-6 shadow-inner text-center">
-        <div className="text-xs text-slate-400 mb-2">Palavra no documento:</div>
-        <div className="font-mono text-3xl tracking-widest text-slate-100 flex items-center justify-center select-none py-4">
-          {currentText.slice(0, cursorPos)}
-          <span className="w-1.5 h-8 bg-amber-400 animate-pulse mx-0.5 rounded-full inline-block shadow-[0_0_8px_#f59e0b]" />
-          {currentText.slice(cursorPos)}
+      {/* Janela de Edição de Texto */}
+      <div className="bg-slate-950 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl text-center relative overflow-hidden">
+        <div className="text-xs uppercase tracking-wider font-bold text-slate-400 mb-3 flex items-center justify-center gap-2">
+          <span>Palavra com erro de digitação:</span>
+          <span className="text-amber-400 font-mono">(Posição {cursorPos} de {currentText.length})</span>
         </div>
 
-        <p className="text-xs text-amber-300 mt-2">{currentExercise.explanation}</p>
+        {/* Display da Palavra com Cursor Piscante */}
+        <div className="font-mono text-3xl sm:text-4xl tracking-widest text-slate-100 flex items-center justify-center select-none py-4 bg-slate-900/80 rounded-2xl border border-slate-800 shadow-inner">
+          <span className="text-slate-300">{currentText.slice(0, cursorPos)}</span>
+          <span className="w-1.5 h-9 bg-amber-400 animate-pulse mx-0.5 rounded-full inline-block shadow-[0_0_10px_#f59e0b]" />
+          <span className="text-slate-300">{currentText.slice(cursorPos)}</span>
+        </div>
+
+        <div className="mt-4 p-3 bg-slate-900/90 rounded-xl border border-slate-800 text-xs text-amber-300 flex items-center justify-center space-x-2">
+          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{currentExercise.explanation}</span>
+        </div>
+
+        {/* Dica de Teclado Físico */}
+        <div className="mt-2 text-[11px] text-slate-400">
+          💡 <span className="text-slate-300 font-semibold">Dica:</span> Pressione a tecla <b>BACKSPACE</b> (⌫) ou <b>DELETE</b> (Del) no seu teclado físico para resolver! Você também pode usar as setas ⬅️ ➡️ para mover o cursor.
+        </div>
       </div>
 
       {feedback && (
-        <div className="text-xs text-center font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 py-2 rounded-lg">
+        <div className="text-xs text-center font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 py-2.5 px-4 rounded-xl animate-in fade-in shadow">
           {feedback}
         </div>
       )}
 
-      {/* Botoes de Ação */}
-      <div className="grid grid-cols-2 gap-4 pt-2">
+      {/* Teclado Virtual Interativo (pode clicar ou usar as teclas físicas) */}
+      <div className="grid grid-cols-2 gap-4 pt-1">
         <button
           onClick={handleBackspace}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-900 to-rose-800 hover:from-rose-800 hover:to-rose-700 text-rose-100 font-bold border border-rose-500/40 shadow-lg active:scale-95 transition"
+          className={`flex items-center justify-center space-x-3 py-3.5 px-4 rounded-2xl font-bold border shadow-lg active:scale-95 transition ${
+            lastKeyPressed === 'Backspace' || currentExercise.requiredKey === 'Backspace'
+              ? 'bg-rose-600 hover:bg-rose-500 text-white border-rose-400 shadow-[0_0_20px_#f43f5e55]'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+          }`}
+          title="Pressione a tecla Backspace no seu teclado ou clique aqui"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Usar BACKSPACE (Apagar à Esquerda)</span>
+          <div className="text-left">
+            <div className="text-xs sm:text-sm font-black">BACKSPACE (⌫)</div>
+            <div className="text-[10px] opacity-80">Apagar Caractere à Esquerda</div>
+          </div>
         </button>
 
         <button
           onClick={handleDelete}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-sky-900 to-sky-800 hover:from-sky-800 hover:to-sky-700 text-sky-100 font-bold border border-sky-500/40 shadow-lg active:scale-95 transition"
+          className={`flex items-center justify-center space-x-3 py-3.5 px-4 rounded-2xl font-bold border shadow-lg active:scale-95 transition ${
+            lastKeyPressed === 'Delete' || currentExercise.requiredKey === 'Delete'
+              ? 'bg-sky-600 hover:bg-sky-500 text-white border-sky-400 shadow-[0_0_20px_#0ea5e955]'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+          }`}
+          title="Pressione a tecla Delete no seu teclado ou clique aqui"
         >
-          <span>Usar DELETE (Apagar à Frente)</span>
+          <div className="text-left">
+            <div className="text-xs sm:text-sm font-black">DELETE (Del)</div>
+            <div className="text-[10px] opacity-80">Apagar Caractere à Frente</div>
+          </div>
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>
   );
 };
+
+export default BackspaceWorkshopActivity;

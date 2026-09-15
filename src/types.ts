@@ -2,7 +2,9 @@ export type Difficulty = 'easy' | 'intermediate' | 'hard';
 
 export type VisionMode = 'normal' | 'prot' | 'deut' | 'trit' | 'low-vision' | 'mono';
 
-export type FontSize = 'small' | 'normal' | 'large' | 'xl';
+export type FontSize = 'small' | 'normal' | 'large' | 'xl' | '2xl';
+
+export type ThemeMode = 'dark' | 'light';
 
 export interface AvatarConfig {
   gender: 'female' | 'male' | 'neutral';
@@ -57,7 +59,13 @@ export interface ActivityDef {
     | 'makeup'
     | 'makeup-game'
     | 'room-decor'
-    | 'penalty-kick';
+    | 'penalty-kick'
+    | 'basketball-game'
+    | 'tennis-game'
+    | 'robot-lego-game'
+    | 'word-search-game'
+    | 'million-show-game'
+    | 'mario-kong-platformer';
   guide: ActivityGuide;
   targetText?: string;
   prompt?: string;
@@ -111,6 +119,7 @@ export interface GameSettings {
   highContrast: boolean;
   patternMode: boolean;
   reducedMotion: boolean;
+  themeMode: ThemeMode;
   fontSize: FontSize;
   largeTargets: boolean;
   focusHighlight: boolean;

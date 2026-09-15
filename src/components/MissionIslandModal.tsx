@@ -27,6 +27,12 @@ import { MotoGameActivity } from './activities/MotoGameActivity';
 import { MakeupActivity } from './activities/MakeupActivity';
 import { RoomDecorActivity } from './activities/RoomDecorActivity';
 import { PenaltyKickActivity } from './activities/PenaltyKickActivity';
+import { BasketballActivity } from './activities/BasketballActivity';
+import { TennisActivity } from './activities/TennisActivity';
+import { RobotLegoActivity } from './activities/RobotLegoActivity';
+import { WordSearchActivity } from './activities/WordSearchActivity';
+import { MillionShowActivity } from './activities/MillionShowActivity';
+import { MarioKongPlatformerActivity } from './activities/MarioKongPlatformerActivity';
 
 interface MissionIslandModalProps {
   island: IslandDef;
@@ -160,6 +166,24 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
     }
     if (currentAct.type === 'penalty-kick') {
       return <PenaltyKickActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'basketball-game') {
+      return <BasketballActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'tennis-game') {
+      return <TennisActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'robot-lego-game') {
+      return <RobotLegoActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'word-search-game') {
+      return <WordSearchActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'million-show-game') {
+      return <MillionShowActivity onComplete={handleFinish} />;
+    }
+    if (currentAct.type === 'mario-kong-platformer') {
+      return <MarioKongPlatformerActivity onComplete={handleFinish} />;
     }
 
     // Default: GenericTypingActivity

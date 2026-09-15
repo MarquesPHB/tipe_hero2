@@ -1,1 +1,201 @@
 @import "tailwindcss";
+
+/* =========================================================
+   ACESSIBILIDADE: MODO PADRÕES E TEXTURAS (PARA DALTONISMO E BAIXA VISÃO)
+   ========================================================= */
+.pattern-mode {
+  --pattern-stripe: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.08) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  --pattern-dots: radial-gradient(
+    rgba(255, 255, 255, 0.15) 2px,
+    transparent 2px
+  );
+}
+
+.pattern-mode button,
+.pattern-mode .interactive-key,
+.pattern-mode .game-card {
+  border-width: 2px !important;
+  border-style: solid !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.pattern-mode button:hover,
+.pattern-mode .interactive-key:hover {
+  outline: 3px solid #facc15 !important;
+  outline-offset: 2px !important;
+}
+
+.pattern-mode .pattern-accent {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(245, 158, 11, 0.25),
+    rgba(245, 158, 11, 0.25) 6px,
+    transparent 6px,
+    transparent 12px
+  ) !important;
+}
+
+.pattern-mode .pattern-target {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(56, 189, 248, 0.25),
+    rgba(56, 189, 248, 0.25) 6px,
+    transparent 6px,
+    transparent 12px
+  ) !important;
+}
+
+.pattern-mode .pattern-success {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.25),
+    rgba(16, 185, 129, 0.25) 6px,
+    transparent 6px,
+    transparent 12px
+  ) !important;
+}
+
+/* =========================================================
+   MODO CLARO (LIGHT MODE)
+   ========================================================= */
+.theme-light {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.theme-light .bg-slate-950,
+.theme-light .bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .bg-slate-950\/90,
+.theme-light .bg-slate-950\/80,
+.theme-light .bg-slate-900\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .bg-slate-800,
+.theme-light .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .border-slate-800,
+.theme-light .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .text-white,
+.theme-light .text-slate-100 {
+  color: #0f172a !important;
+}
+
+.theme-light .text-slate-200,
+.theme-light .text-slate-300 {
+  color: #1e293b !important;
+}
+
+.theme-light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.theme-light header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07) !important;
+}
+
+/* =========================================================
+   ESTÉTICA 2D SUPER NINTENDO (SNES 16-BIT RETRO)
+   ========================================================= */
+.snes-bezel {
+  box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.25),
+              inset -3px -3px 0px rgba(0, 0, 0, 0.5),
+              0 6px 0px rgba(0, 0, 0, 0.4);
+}
+
+.snes-btn {
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.4),
+              inset -2px -2px 0px rgba(0, 0, 0, 0.5),
+              0 4px 0px rgba(0, 0, 0, 0.3);
+  transition: all 0.08s ease-in-out;
+}
+
+.snes-btn:active {
+  transform: translateY(3px);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+              0 1px 0px rgba(0, 0, 0, 0.2);
+}
+
+.snes-coin {
+  animation: snes-coin-bounce 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes snes-coin-bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-5px) scale(1.08);
+  }
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* =========================================================
+   ACESSIBILIDADE: CONTROLE UNIVERSAL DO TAMANHO DA FONTE (A- / A+)
+   Altera a raiz (rem) para escalar absolutamente todo o jogo de forma harmoniosa
+   ========================================================= */
+html.font-size-small {
+  font-size: 13.5px !important;
+}
+
+html.font-size-normal {
+  font-size: 16px !important;
+}
+
+html.font-size-large {
+  font-size: 19.5px !important;
+}
+
+html.font-size-xl {
+  font-size: 23.5px !important;
+}
+
+html.font-size-2xl {
+  font-size: 27.5px !important;
+}
+
+/* Garante escalonamento proporcional mesmo para spans com tamanhos literais */
+html.font-size-small [class*="text-["] {
+  font-size: 0.85em !important;
+}
+
+html.font-size-large [class*="text-["] {
+  font-size: 1.2em !important;
+}
+
+html.font-size-xl [class*="text-["] {
+  font-size: 1.45em !important;
+}
+
+html.font-size-2xl [class*="text-["] {
+  font-size: 1.7em !important;
+}
+
+

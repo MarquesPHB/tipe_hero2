@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { IslandDef, PlayerStats, AvatarConfig, GameSettings, Difficulty } from './types';
+import { IslandDef, PlayerStats, AvatarConfig, GameSettings, Difficulty, FontSize } from './types';
 import { ISLANDS } from './data/curriculum';
 import { sounds } from './audio/soundEngine';
 import { speakText } from './speech/tts';
@@ -53,6 +53,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   highContrast: false,
   patternMode: false,
   reducedMotion: false,
+  themeMode: 'dark',
   fontSize: 'normal',
   largeTargets: false,
   focusHighlight: true,
@@ -237,15 +238,54 @@ export const App: React.FC = () => {
     setPracticeErrorText(drill);
   };
 
-  // Aplicação das classes de acessibilidade
-  const fontClass =
-    settings.fontSize === 'small'
-      ? 'text-xs'
-      : settings.fontSize === 'large'
-      ? 'text-lg'
-      : settings.fontSize === 'xl'
-      ? 'text-xl'
-      : 'text-base';
+  const handleDecreaseFontSize = () => {
+    setSettings((s) => {
+      if (s.fontSize === '2xl') return { ...s, fontSize: 'xl' };
+      if (s.fontSize === 'xl') return { ...s, fontSize: 'large' };
+      if (s.fontSize === 'large') return { ...s, fontSize: 'normal' };
+      if (s.fontSize === 'normal') return { ...s, fontSize: 'small' };
+      return s;
+    });
+  };
+
+  const handleIncreaseFontSize = () => {
+    setSettings((s) => {
+      if (s.fontSize === 'small') return { ...s, fontSize: 'normal' };
+      if (s.fontSize === 'normal') return { ...s, fontSize: 'large' };
+      if (s.fontSize === 'large') return { ...s, fontSize: 'xl' };
+      if (s.fontSize === 'xl') return { ...s, fontSize: '2xl' };
+      return s;
+    });
+  };
+
+  const handleToggleTheme = () => {
+    setSettings((s) => ({
+      ...s,
+      themeMode: s.themeMode === 'light' ? 'dark' : 'light',
+    }));
+  };
+
+  // Aplicação universal e dinâmica da escala de fonte em TODO o jogo (multiplicador raiz rem)
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove(
+      'font-size-small',
+      'font-size-normal',
+      'font-size-large',
+      'font-size-xl',
+      'font-size-2xl'
+    );
+    root.classList.add(`font-size-${settings.fontSize}`);
+
+    const sizeMap: Record<FontSize, string> = {
+      small: '13.5px',
+      normal: '16px',
+      large: '19.5px',
+      xl: '23.5px',
+      '2xl': '27.5px',
+    };
+    root.style.fontSize = sizeMap[settings.fontSize] || '16px';
+  }, [settings.fontSize]);
 
   const visionClass =
     settings.visionMode === 'mono'
@@ -256,9 +296,12 @@ export const App: React.FC = () => {
       ? 'contrast-150 font-bold'
       : '';
 
+  const themeClass = settings.themeMode === 'light' ? 'theme-light bg-slate-100 text-slate-900' : 'bg-slate-950 text-slate-100';
+  const patternClass = settings.patternMode ? 'pattern-mode' : '';
+
   return (
     <div
-      className={`min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans transition-colors ${fontClass} ${visionClass} ${
+      className={`min-h-screen flex flex-col font-sans transition-colors ${themeClass} ${patternClass} ${visionClass} ${
         settings.highContrast ? 'contrast-125' : ''
       }`}
     >
@@ -269,6 +312,8 @@ export const App: React.FC = () => {
         avatar={avatar}
         difficulty={settings.difficulty}
         soundEnabled={settings.sound}
+        fontSize={settings.fontSize}
+        themeMode={settings.themeMode}
         onTabChange={(tab) => {
           if (tab === 'shop') setShowShop(true);
           else if (tab === 'settings') setCurrentTab('settings');
@@ -283,6 +328,9 @@ export const App: React.FC = () => {
           });
         }}
         onOpenAvatarEditor={() => setShowAvatarEditor(true)}
+        onDecreaseFontSize={handleDecreaseFontSize}
+        onIncreaseFontSize={handleIncreaseFontSize}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Conteúdo Principal Adaptativo */}

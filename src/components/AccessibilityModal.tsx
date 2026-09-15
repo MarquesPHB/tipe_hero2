@@ -120,31 +120,103 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             </div>
           </div>
 
-          {/* Tamanho de Texto */}
+          {/* Modo de Iluminação / Tema */}
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-            <div className="flex items-center space-x-2 text-sm font-bold text-amber-400">
-              <Type className="w-4 h-4" />
-              <span>Tamanho do Texto</span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-amber-400">Tema Visual (Modo Claro & Escuro)</span>
+              <span className="text-[11px] text-slate-400">
+                {current.themeMode === 'light' ? '☀️ Modo Claro Ativo' : '🌙 Modo Escuro Ativo'}
+              </span>
             </div>
-            <div className="grid grid-cols-4 gap-2">
-              {[
-                { id: 'small', label: 'Pequeno' },
-                { id: 'normal', label: 'Normal' },
-                { id: 'large', label: 'Grande' },
-                { id: 'xl', label: 'Muito Grande' },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => update('fontSize', f.id as FontSize)}
-                  className={`py-2 rounded-xl border font-bold text-center transition ${
-                    current.fontSize === f.id
-                      ? 'bg-amber-400 text-slate-950 border-amber-300'
-                      : 'bg-slate-900 text-slate-300 border-slate-800'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => update('themeMode', 'dark')}
+                className={`py-2 px-3 rounded-xl border font-bold flex items-center justify-center space-x-2 transition ${
+                  current.themeMode !== 'light'
+                    ? 'bg-indigo-600 text-white border-indigo-400 shadow'
+                    : 'bg-slate-900 text-slate-300 border-slate-800'
+                }`}
+              >
+                <span>🌙 Modo Escuro (Noturno)</span>
+              </button>
+              <button
+                onClick={() => update('themeMode', 'light')}
+                className={`py-2 px-3 rounded-xl border font-bold flex items-center justify-center space-x-2 transition ${
+                  current.themeMode === 'light'
+                    ? 'bg-amber-400 text-slate-950 border-amber-300 shadow font-black'
+                    : 'bg-slate-900 text-slate-300 border-slate-800'
+                }`}
+              >
+                <span>☀️ Modo Claro (Diurno)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tamanho de Texto - Botões Padrão A- / A / A+ */}
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-sm font-bold text-amber-400">
+                <Type className="w-4 h-4" />
+                <span>Tamanho da Fonte (Acessibilidade Visual)</span>
+              </div>
+              <span className="text-xs font-mono font-bold text-sky-400 bg-sky-950/60 px-2.5 py-0.5 rounded-lg border border-sky-500/30">
+                {current.fontSize === 'small'
+                  ? '85% (Compacto)'
+                  : current.fontSize === 'normal'
+                  ? '100% (Padrão)'
+                  : current.fontSize === 'large'
+                  ? '120% (Ampliado)'
+                  : current.fontSize === 'xl'
+                  ? '145% (Grande)'
+                  : '170% (Máximo Extra)'}
+              </span>
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Use os botões universais abaixo para aumentar ou reduzir o tamanho das letras e elementos em toda a plataforma:
+            </p>
+
+            <div className="flex items-center justify-center space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (current.fontSize === '2xl') update('fontSize', 'xl');
+                  else if (current.fontSize === 'xl') update('fontSize', 'large');
+                  else if (current.fontSize === 'large') update('fontSize', 'normal');
+                  else if (current.fontSize === 'normal') update('fontSize', 'small');
+                }}
+                disabled={current.fontSize === 'small'}
+                className="flex-1 py-3 px-4 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-white font-black text-sm flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition shadow"
+                title="Diminuir tamanho da fonte de todo o jogo (A-)"
+              >
+                <span className="text-base font-serif">A−</span>
+                <span className="text-xs font-normal text-slate-300">Diminuir</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => update('fontSize', 'normal')}
+                className="py-3 px-5 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-amber-400 font-black text-sm flex items-center justify-center space-x-1 active:scale-95 transition shadow"
+                title="Redefinir para o tamanho padrão de fábrica (100%)"
+              >
+                <span className="text-sm font-serif">A</span>
+                <span className="text-[11px] font-normal text-slate-400">Padrão</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (current.fontSize === 'small') update('fontSize', 'normal');
+                  else if (current.fontSize === 'normal') update('fontSize', 'large');
+                  else if (current.fontSize === 'large') update('fontSize', 'xl');
+                  else if (current.fontSize === 'xl') update('fontSize', '2xl');
+                }}
+                disabled={current.fontSize === '2xl'}
+                className="flex-1 py-3 px-4 rounded-xl border border-sky-500/40 bg-sky-950/60 hover:bg-sky-900 text-sky-300 font-black text-base flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition shadow"
+                title="Aumentar tamanho da fonte de todo o jogo (A+)"
+              >
+                <span className="text-lg font-serif">A+</span>
+                <span className="text-xs font-normal text-slate-300">Aumentar</span>
+              </button>
             </div>
           </div>
 
