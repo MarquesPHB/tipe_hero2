@@ -123,4 +123,5 @@ export interface GameSettings {
   fontSize: FontSize;
   largeTargets: boolean;
   focusHighlight: boolean;
+  presentationMode: boolean;
 }

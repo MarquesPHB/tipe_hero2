@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GameSettings, VisionMode, FontSize } from '../types';
 import { sounds } from '../audio/soundEngine';
 import { speakText, getPtBRVoices } from '../speech/tts';
-import { X, Sliders, Volume2, Eye, Type, Zap, Check } from 'lucide-react';
+import { X, Sliders, Volume2, Eye, Type, Zap, Check, Maximize2, Minimize2 } from 'lucide-react';
 
 interface AccessibilityModalProps {
   settings: GameSettings;
@@ -150,6 +150,43 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
                 <span>☀️ Modo Claro (Diurno)</span>
               </button>
             </div>
+          </div>
+
+          {/* Modo Apresentação / Tela Cheia */}
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-sm font-bold text-amber-400">
+                <Maximize2 className="w-4 h-4" />
+                <span>Modo Apresentação (Preencher a Tela Toda)</span>
+              </div>
+              <span className="text-[11px] text-slate-400">
+                {current.presentationMode ? '🖥️ Tela Cheia Ativa' : 'Janela Normal'}
+              </span>
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Expande todo o jogo para preencher 100% da tela do computador ou projetor multimídia, ideal para aulas e apresentações.
+            </p>
+            <button
+              type="button"
+              onClick={() => update('presentationMode', !current.presentationMode)}
+              className={`w-full py-2.5 px-4 rounded-xl border font-bold flex items-center justify-center space-x-2 transition ${
+                current.presentationMode
+                  ? 'bg-amber-400 text-slate-950 border-amber-300 font-black shadow'
+                  : 'bg-slate-900 text-slate-300 border-slate-700 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {current.presentationMode ? (
+                <>
+                  <Minimize2 className="w-4 h-4" />
+                  <span>Desativar Modo Apresentação</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-4 h-4 text-amber-400" />
+                  <span>Ativar Modo Apresentação (Tela Cheia)</span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Tamanho de Texto - Botões Padrão A- / A / A+ */}

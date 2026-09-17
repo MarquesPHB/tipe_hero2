@@ -39,6 +39,7 @@ interface MissionIslandModalProps {
   activitiesDone: boolean[];
   playerWpm: number;
   playerAccuracy: number;
+  isPresentation?: boolean;
   onClose: () => void;
   onActivityComplete: (activityIdx: number, score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }) => void;
 }
@@ -48,6 +49,7 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
   activitiesDone,
   playerWpm,
   playerAccuracy,
+  isPresentation = false,
   onClose,
   onActivityComplete,
 }) => {
@@ -199,8 +201,12 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-7 shadow-2xl my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4 overflow-y-auto">
+      <div
+        className={`relative w-full ${
+          isPresentation ? 'max-w-6xl lg:max-w-7xl' : 'max-w-4xl'
+        } bg-slate-900 border border-slate-700 rounded-3xl p-4 sm:p-7 shadow-2xl my-auto transition-all`}
+      >
         {/* Header da Ilha */}
         <div className="flex items-start justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center space-x-3">

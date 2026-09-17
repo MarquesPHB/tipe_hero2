@@ -14,7 +14,7 @@ import { AvatarEditorModal } from './components/AvatarEditorModal';
 import { HelpModal } from './components/HelpModal';
 import { CertificateModal } from './components/activities/CertificateModal';
 import { GenericTypingActivity } from './components/activities/GenericTypingActivity';
-import { Sparkles, Compass, MapPin, ChevronRight, BookOpen, Volume2 } from 'lucide-react';
+import { Sparkles, Compass, MapPin, ChevronRight, BookOpen, Volume2, Minimize2 } from 'lucide-react';
 
 const STORAGE_KEYS = {
   STATS: 'typehero_stats_v2',
@@ -57,6 +57,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   fontSize: 'normal',
   largeTargets: false,
   focusHighlight: true,
+  presentationMode: false,
 };
 
 const DEFAULT_STATS: PlayerStats = {
@@ -265,6 +266,54 @@ export const App: React.FC = () => {
     }));
   };
 
+  const handleTogglePresentationMode = useCallback(() => {
+    setSettings((s) => {
+      const nextMode = !s.presentationMode;
+      if (nextMode) {
+        try {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen?.().catch(() => {});
+          }
+        } catch {
+          // Navegadores em iframe ou restrições de tela cheia
+        }
+      } else {
+        try {
+          if (document.fullscreenElement) {
+            document.exitFullscreen?.().catch(() => {});
+          }
+        } catch {
+          // Tratamento silencioso
+        }
+      }
+      return { ...s, presentationMode: nextMode };
+    });
+  }, []);
+
+  // Sincronizar estado de tela cheia com eventos nativos do navegador (ex: tecla ESC)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isFs = Boolean(document.fullscreenElement);
+      if (!isFs) {
+        setSettings((s) => (s.presentationMode ? { ...s, presentationMode: false } : s));
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Atalho de teclado F11 para alternar Modo Apresentação
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F11') {
+        e.preventDefault();
+        handleTogglePresentationMode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleTogglePresentationMode]);
+
   // Aplicação universal e dinâmica da escala de fonte em TODO o jogo (multiplicador raiz rem)
   useEffect(() => {
     const root = document.documentElement;
@@ -314,6 +363,7 @@ export const App: React.FC = () => {
         soundEnabled={settings.sound}
         fontSize={settings.fontSize}
         themeMode={settings.themeMode}
+        presentationMode={settings.presentationMode}
         onTabChange={(tab) => {
           if (tab === 'shop') setShowShop(true);
           else if (tab === 'settings') setCurrentTab('settings');
@@ -331,10 +381,11 @@ export const App: React.FC = () => {
         onDecreaseFontSize={handleDecreaseFontSize}
         onIncreaseFontSize={handleIncreaseFontSize}
         onToggleTheme={handleToggleTheme}
+        onTogglePresentationMode={handleTogglePresentationMode}
       />
 
       {/* Conteúdo Principal Adaptativo */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col space-y-6">
+      <main className={`flex-1 w-full mx-auto p-3 sm:p-5 flex flex-col space-y-6 transition-all ${settings.presentationMode ? 'max-w-none px-4 sm:px-8' : 'max-w-7xl'}`}>
         {/* ABA: MUNDO (MAPA INTERATIVO 2D COM PROGRESSÃO PEDAGÓGICA) */}
         {currentTab === 'world' && (
           <div className="space-y-4">
@@ -377,6 +428,7 @@ export const App: React.FC = () => {
               islands={ISLANDS}
               currentIslandIdx={stats.completedPhases.length < 10 ? stats.completedPhases.length : 9}
               avatar={avatar}
+              isPresentation={settings.presentationMode}
               onSelectIsland={(islandId) => setActiveIslandIdx(islandId)}
               onOpenHelp={() => setShowHelp(true)}
             />
@@ -424,7 +476,12 @@ export const App: React.FC = () => {
           <div className="max-w-3xl mx-auto w-full">
             <AccessibilityModal
               settings={settings}
-              onSave={(s) => setSettings(s)}
+              onSave={(s) => {
+                if (s.presentationMode !== settings.presentationMode) {
+                  handleTogglePresentationMode();
+                }
+                setSettings(s);
+              }}
               onClose={() => setCurrentTab('world')}
             />
           </div>
@@ -438,6 +495,7 @@ export const App: React.FC = () => {
           activitiesDone={activitiesDoneByIsland[activeIslandIdx] || new Array(ISLANDS[activeIslandIdx]?.activities.length || 12).fill(false)}
           playerWpm={stats.wpm}
           playerAccuracy={stats.accuracy}
+          isPresentation={settings.presentationMode}
           onClose={() => setActiveIslandIdx(null)}
           onActivityComplete={handleActivityComplete}
         />
@@ -507,6 +565,26 @@ export const App: React.FC = () => {
               }}
             />
           </div>
+        </div>
+      )}
+
+      {/* Indicador Flutuante e Saída Rápida do Modo Apresentação */}
+      {settings.presentationMode && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-slate-950/95 border border-amber-400/80 px-3.5 py-2 rounded-2xl shadow-2xl backdrop-blur-md">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+          </span>
+          <span className="text-xs font-bold text-amber-300">Modo Apresentação</span>
+          <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">[F11 ou ESC]</span>
+          <button
+            onClick={handleTogglePresentationMode}
+            className="ml-2 px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-black transition flex items-center space-x-1 active:scale-95 shadow"
+            title="Sair do modo apresentação (Restaurar tela padrão)"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Sair da Tela Cheia</span>
+          </button>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { AvatarConfig, Difficulty, FontSize, PlayerStats, ThemeMode } from '../types';
 import { AvatarDisplay } from './AvatarDisplay';
 import { sounds } from '../audio/soundEngine';
-import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders, Sun, Moon } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders, Sun, Moon, Maximize2, Minimize2 } from 'lucide-react';
 
 interface TopBarProps {
   currentTab: 'world' | 'missions' | 'shop' | 'profile' | 'settings';
@@ -12,6 +12,7 @@ interface TopBarProps {
   soundEnabled: boolean;
   fontSize: FontSize;
   themeMode: ThemeMode;
+  presentationMode: boolean;
   onTabChange: (tab: 'world' | 'missions' | 'shop' | 'profile' | 'settings') => void;
   onDifficultyChange: (diff: Difficulty) => void;
   onToggleSound: () => void;
@@ -19,6 +20,7 @@ interface TopBarProps {
   onDecreaseFontSize: () => void;
   onIncreaseFontSize: () => void;
   onToggleTheme: () => void;
+  onTogglePresentationMode: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -29,6 +31,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   soundEnabled,
   fontSize,
   themeMode,
+  presentationMode,
   onTabChange,
   onDifficultyChange,
   onToggleSound,
@@ -36,10 +39,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   onDecreaseFontSize,
   onIncreaseFontSize,
   onToggleTheme,
+  onTogglePresentationMode,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-2.5 shadow-md">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div className={`${presentationMode ? 'w-full px-1 sm:px-3' : 'max-w-7xl mx-auto'} flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 transition-all`}>
         {/* Marca TypeHero */}
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onTabChange('world')}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 border-2 border-amber-400/80 flex items-center justify-center text-xl text-white font-bold shadow-[0_0_15px_#38bdf833]">
@@ -137,6 +141,36 @@ export const TopBar: React.FC<TopBarProps> = ({
               A+
             </button>
           </div>
+
+          {/* Botão Modo Apresentação (Preencher tela toda) */}
+          <button
+            onClick={() => {
+              sounds.keyClick();
+              onTogglePresentationMode();
+            }}
+            className={`h-9 px-2.5 sm:px-3 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition active:scale-95 shadow-sm ${
+              presentationMode
+                ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-300 shadow-[0_0_15px_#f59e0b80] font-black'
+                : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+            title={
+              presentationMode
+                ? 'Sair do Modo Apresentação (Restaurar tela normal) [ESC ou F11]'
+                : 'Ativar Modo Apresentação para preencher a tela toda [F11]'
+            }
+          >
+            {presentationMode ? (
+              <>
+                <Minimize2 className="w-4 h-4 text-slate-950 shrink-0" />
+                <span className="hidden sm:inline font-black">Tela Cheia</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="hidden sm:inline">Apresentação</span>
+              </>
+            )}
+          </button>
 
           {/* Alternador Modo Claro / Escuro */}
           <button

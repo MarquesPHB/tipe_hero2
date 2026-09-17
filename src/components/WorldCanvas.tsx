@@ -8,6 +8,7 @@ interface WorldCanvasProps {
   islands: IslandDef[];
   currentIslandIdx: number;
   avatar: AvatarConfig;
+  isPresentation?: boolean;
   onSelectIsland: (islandId: number) => void;
   onOpenHelp: () => void;
 }
@@ -16,6 +17,7 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({
   islands,
   currentIslandIdx,
   avatar,
+  isPresentation = false,
   onSelectIsland,
   onOpenHelp,
 }) => {
@@ -299,7 +301,12 @@ export const WorldCanvas: React.FC<WorldCanvasProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[520px] lg:h-[620px] rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl select-none">
+    <div
+      ref={containerRef}
+      className={`relative w-full ${
+        isPresentation ? 'h-[calc(100vh-160px)] min-h-[560px]' : 'h-[520px] lg:h-[620px]'
+      } rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl select-none transition-all`}
+    >
       <canvas
         ref={canvasRef}
         onClick={handleCanvasClick}
