@@ -119,7 +119,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
     speakText(targetText);
   };
 
-  // Se o aluno escolheu jogar no modo Chuva de Bolhas (Tetris)
+  // Se o aluno escolheu jogar no modo Chuva de Bolhas
   if (gameMode === 'bubbles') {
     return (
       <div className="flex flex-col space-y-3 w-full">
@@ -139,7 +139,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
             <button
               className="px-3 py-1 rounded-lg text-xs font-black bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow"
             >
-              🫧 Chuva de Bolhas (Tetris)
+              🫧 Chuva de Bolhas
             </button>
           </div>
         </div>
@@ -157,7 +157,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
   // Modo Digitação Tradicional com Opção de Alternar
   return (
     <div className="flex flex-col space-y-3.5 select-none w-full max-w-4xl mx-auto">
-      {/* Seletor de Modo no Topo (Alternar para Chuva de Bolhas Tetris) */}
+      {/* Seletor de Modo no Topo (Alternar para Chuva de Bolhas) */}
       <div className="flex items-center justify-between bg-slate-900/90 border border-slate-700/70 rounded-2xl px-3.5 py-1.5 shadow-sm">
         <span className="text-xs font-bold text-slate-300">Modo de Jogo:</span>
         <div className="flex space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
@@ -174,7 +174,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
             className="px-3 py-1 rounded-lg text-xs font-bold text-sky-400 hover:bg-sky-950/60 hover:text-sky-300 transition flex items-center space-x-1"
           >
             <span>🫧</span>
-            <span>Chuva de Bolhas (Tetris)</span>
+            <span>Chuva de Bolhas</span>
           </button>
         </div>
       </div>

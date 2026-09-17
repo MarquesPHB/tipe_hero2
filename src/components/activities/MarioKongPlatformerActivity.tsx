@@ -44,7 +44,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
     { id: 6, x: 280, y: 90, key: 'J', isHit: false },
   ]);
 
-  // Rolling Barrels from Donkey Kong
+  // Rolling Barrels from Tower Guardian
   const [barrels, setBarrels] = useState<Barrel[]>([
     { id: 1, x: 380, y: 80, dir: 'left', level: 2 },
     { id: 2, x: 100, y: 180, dir: 'right', level: 1 },
@@ -69,7 +69,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
               nextLevel -= 1;
               nextY = nextLevel === 1 ? 180 : 285;
             } else {
-              // Loop back to Donkey Kong
+              // Loop back to Tower Guardian
               nextX = 400;
               nextY = 80;
               nextLevel = 2;
@@ -80,7 +80,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
               nextLevel -= 1;
               nextY = nextLevel === 1 ? 180 : 285;
             } else {
-              // Loop back to Donkey Kong
+              // Loop back to Tower Guardian
               nextX = 400;
               nextY = 80;
               nextLevel = 2;
@@ -130,7 +130,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
     setIsJumping(true);
     sounds.whoosh();
 
-    // Jump Mario towards block
+    // Jump hero towards block
     setPlayerX(targetBlock.x);
     setPlayerY(targetBlock.y + 35);
 
@@ -167,7 +167,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
         setIsFinished(true);
         sounds.victoryFanfare();
         confetti({ particleCount: 120, spread: 90 });
-        setFeedback('🏆 VOCÊ DERROTOU O DONKEY KONG E SALVOU A PRINCESA!');
+        setFeedback('🏆 VOCÊ CONQUISTOU A TORRE E SALVOU O REINO!');
         setTimeout(() => {
           onComplete({
             wpm: 38,
@@ -178,22 +178,22 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
           });
         }, 2000);
       } else {
-        setFeedback(`✨ Bloco [ ${targetBlock.key} ] quebrado! +10 Moedas Super Nintendo!`);
+        setFeedback(`✨ Bloco [ ${targetBlock.key} ] quebrado! +10 Moedas Douradas Retrô!`);
       }
     }, 250);
   };
 
   return (
     <div className="flex flex-col space-y-4 max-w-3xl mx-auto select-none">
-      {/* Header SNES 16-bit Super Mario & Kong */}
-      <div className="bg-slate-900 border-4 border-rose-500 rounded-2xl p-4 shadow-2xl flex flex-wrap items-center justify-between gap-3 snes-bezel">
+      {/* Header Retrô 16-bit Plataforma */}
+      <div className="bg-slate-900 border-4 border-amber-500 rounded-2xl p-4 shadow-2xl flex flex-wrap items-center justify-between gap-3 snes-bezel">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-red-600 border-2 border-amber-300 text-white flex items-center justify-center text-xl font-bold shadow">
-            🍄
+          <div className="w-10 h-10 rounded-xl bg-amber-600 border-2 border-amber-300 text-white flex items-center justify-center text-xl font-bold shadow">
+            🕹️
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-black text-rose-300 tracking-wider font-mono">
-              SUPER MARIO & DONKEY KONG 16-BIT
+            <h3 className="text-sm sm:text-base font-black text-amber-300 tracking-wider font-mono">
+              AVENTURA NAS PLATAFORMAS RETRÔ 16-BIT
             </h3>
             <p className="text-xs text-slate-300">
               Blocos Quebrados: {blocks.filter((b) => b.isHit).length} de {blocks.length}
@@ -216,13 +216,13 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
         </div>
       </div>
 
-      {/* Cenário de Plataforma 2D SNES */}
+      {/* Cenário de Plataforma 2D Retrô */}
       <div className="relative w-full h-[350px] bg-gradient-to-b from-indigo-950 via-slate-900 to-amber-950 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-2xl snes-bezel flex items-center justify-center">
         <svg viewBox="0 0 600 350" className="w-full h-full">
           {/* Fundo do Castelo Retrô */}
           <rect x="0" y="0" width="600" height="350" fill="#090d16" />
 
-          {/* RAMPAS E PLATAFORMAS (Vigas de Aço Vermelhas Estilo Donkey Kong) */}
+          {/* RAMPAS E PLATAFORMAS (Vigas de Aço Vermelhas Retrô Arcade) */}
           {/* Nível Térreo */}
           <rect x="20" y="320" width="560" height="20" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
           <line x1="20" y1="325" x2="580" y2="325" stroke="#fca5a5" strokeWidth="2" strokeDasharray="10 5" />
@@ -252,22 +252,22 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
             ))}
           </g>
 
-          {/* DONKEY KONG NO TOPO (Pixel Art 16-bit) */}
+          {/* GUARDIÃO DA TORRE NO TOPO (Pixel Art 16-bit) */}
           <g transform="translate(420, 50)">
             <ellipse cx="30" cy="55" rx="25" ry="8" fill="rgba(0,0,0,0.5)" />
-            {/* Corpo do Gorila */}
-            <rect x="10" y="15" width="40" height="38" rx="8" fill="#78350f" stroke="#451a03" strokeWidth="2" />
-            <ellipse cx="30" cy="30" rx="14" ry="12" fill="#d97706" />
-            {/* Gravata Vermelha DK */}
-            <polygon points="28,26 32,26 34,42 26,42" fill="#ef4444" />
-            <text x="30" y="38" fill="#facc15" fontSize="7" fontWeight="black" textAnchor="middle">DK</text>
+            {/* Corpo do Guardião */}
+            <rect x="10" y="15" width="40" height="38" rx="8" fill="#581c87" stroke="#3b0764" strokeWidth="2" />
+            <ellipse cx="30" cy="30" rx="14" ry="12" fill="#7e22ce" />
+            {/* Emblema Dourado com Estrela */}
+            <circle cx="30" cy="34" r="8" fill="#facc15" stroke="#ca8a04" strokeWidth="1.5" />
+            <text x="30" y="38" fill="#713f12" fontSize="9" fontWeight="black" textAnchor="middle">★</text>
             {/* Cabeça */}
-            <circle cx="30" cy="10" r="14" fill="#78350f" />
+            <circle cx="30" cy="10" r="14" fill="#581c87" />
             <circle cx="25" cy="8" r="3" fill="#ffffff" />
             <circle cx="35" cy="8" r="3" fill="#ffffff" />
-            <circle cx="25" cy="8" r="1.5" fill="#000000" />
-            <circle cx="35" cy="8" r="1.5" fill="#000000" />
-            {/* Braços com Barril */}
+            <circle cx="25" cy="8" r="1.5" fill="#facc15" />
+            <circle cx="35" cy="8" r="1.5" fill="#facc15" />
+            {/* Braços com Barril Mágico */}
             <rect x="52" y="18" width="22" height="26" rx="4" fill="#92400e" stroke="#451a03" strokeWidth="2" />
             <line x1="52" y1="24" x2="74" y2="24" stroke="#000000" strokeWidth="1.5" />
             <line x1="52" y1="36" x2="74" y2="36" stroke="#000000" strokeWidth="1.5" />
@@ -320,23 +320,22 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
             </g>
           ))}
 
-          {/* JOGADOR HEROI (MARIO 16-BIT PIXEL ART) */}
+          {/* JOGADOR HERÓI AVENTUREIRO (PIXEL ART 16-BIT) */}
           <g transform={`translate(${playerX - 14}, ${playerY - 26})`}>
             {/* Sombra */}
             <ellipse cx="14" cy="30" rx="14" ry="5" fill="rgba(0,0,0,0.4)" />
-            {/* Macacão Azul */}
-            <rect x="8" y="14" width="12" height="14" rx="2" fill="#2563eb" />
-            {/* Camisa Vermelha */}
-            <rect x="6" y="10" width="16" height="6" fill="#ef4444" />
-            {/* Botões Amarelos */}
-            <circle cx="10" cy="18" r="1.5" fill="#facc15" />
-            <circle cx="18" cy="18" r="1.5" fill="#facc15" />
-            {/* Rosto / Bigode */}
-            <circle cx="14" cy="6" r="6" fill="#fde047" />
-            <rect x="11" y="7" width="8" height="2.5" rx="1" fill="#451a03" />
-            {/* Boné Vermelho */}
-            <rect x="7" y="0" width="14" height="4" rx="2" fill="#ef4444" />
-            <polygon points="17,3 24,3 21,5 17,5" fill="#ef4444" />
+            {/* Armadura/Túnica Esmeralda */}
+            <rect x="8" y="14" width="12" height="14" rx="2" fill="#059669" />
+            {/* Cinto e Peitoral Dourado */}
+            <rect x="6" y="10" width="16" height="6" fill="#f59e0b" />
+            {/* Fivela de Ouro */}
+            <circle cx="10" cy="18" r="1.5" fill="#fef08a" />
+            <circle cx="18" cy="18" r="1.5" fill="#fef08a" />
+            {/* Rosto do Herói */}
+            <circle cx="14" cy="6" r="6" fill="#fed7aa" />
+            {/* Faixa Heroica na Testa */}
+            <rect x="7" y="2" width="14" height="3" rx="1" fill="#0284c7" />
+            <polygon points="17,3 24,1 21,5 17,4" fill="#0284c7" />
           </g>
         </svg>
 
@@ -346,7 +345,7 @@ export const MarioKongPlatformerActivity: React.FC<MarioKongPlatformerActivityPr
             <span className="text-6xl animate-bounce">👑</span>
             <h3 className="text-2xl font-black text-white">FASE RETRÔ CONCLUÍDA!</h3>
             <p className="text-xs text-slate-300 max-w-md">
-              Você escalou o castelo, desviou de todos os barris do Donkey Kong e recolheu todas as moedas Super Nintendo!
+              Você escalou o castelo, desviou de todos os barris do Guardião da Torre e recolheu todas as moedas douradas retrô!
             </p>
           </div>
         )}

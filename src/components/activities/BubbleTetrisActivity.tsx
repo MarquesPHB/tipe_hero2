@@ -276,7 +276,7 @@ export const BubbleTetrisActivity: React.FC<BubbleTetrisActivityProps> = ({
         </div>
       </div>
 
-      {/* Arena de Queda das Bolhas (Tetris de Bolhas) */}
+      {/* Arena de Queda das Bolhas */}
       <div
         ref={containerRef}
         className="relative w-full h-[320px] bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950/70 border-2 border-indigo-500/40 rounded-3xl overflow-hidden shadow-2xl"

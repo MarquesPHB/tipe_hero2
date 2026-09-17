@@ -139,7 +139,7 @@ export const PacManActivity: React.FC<PacManActivityProps> = ({ onComplete }) =>
           <span className="text-2xl">🟡</span>
           <div>
             <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-              Pac-Brotinho no Labirinto
+              Brotinho no Labirinto de Sementes
               <span className="text-xs font-normal text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-500/30">
                 {dotsEaten} de {TARGET_DOTS} sementes colhidas
               </span>
@@ -218,7 +218,7 @@ export const PacManActivity: React.FC<PacManActivityProps> = ({ onComplete }) =>
           <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 z-30 animate-in fade-in">
             <span className="text-5xl animate-bounce">🟡🍒🎉</span>
             <h3 className="text-xl font-black text-amber-400">Labirinto Conquistado!</h3>
-            <p className="text-xs text-slate-200">Você guiou o Pac-Brotinho com precisão total através do labirinto!</p>
+            <p className="text-xs text-slate-200">Você guiou o Brotinho com precisão total através do labirinto!</p>
           </div>
         )}
       </div>

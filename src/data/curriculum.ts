@@ -281,7 +281,7 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'control-keys-drill',
-        title: '8. Chuva de Bolhas ABNT2 (Tetris)',
+        title: '8. Chuva de Bolhas ABNT2 (Cascata Flutuante)',
         type: 'bubble-tetris',
         targetText: 'asdfjklçqwer',
         guide: {
@@ -308,10 +308,10 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'pac-man-maze',
-        title: '10. Pac-Brotinho no Labirinto (Navegação em Corredores)',
+        title: '10. Brotinho no Labirinto (Navegação em Corredores)',
         type: 'pac-man',
         guide: {
-          objective: 'Conduzir o simpático Pac-Brotinho pelos corredores do labirinto colhendo sementes douradas e cerejinhas.',
+          objective: 'Conduzir o simpático Brotinho pelos corredores do labirinto colhendo sementes douradas e cerejinhas.',
           howToPlay: 'Use as setas para virar nas esquinas certas do labirinto e colher as sementes do pomar!',
           fingers: 'Dedos ágeis nas teclas direcionais para reagir em cada cruzamento.',
           pedagogicalTip: 'Mantenha a visão panorâmica no labirinto para planejar o caminho antes das esquinas.',
@@ -419,7 +419,7 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'home-alternated-fingers',
-        title: '7. Chuva de Bolhas da Linha-Base (Tetris)',
+        title: '7. Chuva de Bolhas da Linha-Base (Cascata Flutuante)',
         type: 'bubble-tetris',
         targetText: 'asdfghjklç',
         guide: {
@@ -460,11 +460,11 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'home-robot-lego',
-        title: '10. Oficina Lego & Montagem do Robô Titã 16-Bit',
+        title: '10. Oficina de Montagem & Robô Titã 16-Bit',
         type: 'robot-lego-game',
         guide: {
-          objective: 'Montar peça por peça o robô mecha gigante conectando blocos de lego através da digitação das teclas corretas!',
-          howToPlay: 'Pressione no teclado a letra da peça de lego (A, S, D, F, J, K) para encaixar e construir seu robô animado!',
+          objective: 'Montar peça por peça o robô mecha gigante conectando blocos modulares através da digitação das teclas corretas!',
+          howToPlay: 'Pressione no teclado a letra da peça modular (A, S, D, F, J, K) para encaixar e construir seu robô animado!',
           fingers: 'Dedos firmes repousados na linha-base ASDF e JKLÇ.',
           pedagogicalTip: 'A construção lúdica associa o prazer de criar à agilidade dos dedos no teclado.',
         },
@@ -586,7 +586,7 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'top-speed-circuit',
-        title: '8. Chuva de Bolhas dos Picos Superiores (Tetris)',
+        title: '8. Chuva de Bolhas dos Picos Superiores (Cascata Flutuante)',
         type: 'bubble-tetris',
         targetText: 'qwert yuiop asdf',
         guide: {
@@ -1286,10 +1286,10 @@ export const ISLANDS: IslandDef[] = [
       },
       {
         id: 'nitro-mario-kong',
-        title: '9. Super Mario & Donkey Kong 16-Bit: Escalada das Plataformas',
+        title: '9. Aventura nas Plataformas Retrô 16-Bit: Escalada da Torre',
         type: 'mario-kong-platformer',
         guide: {
-          objective: 'Pular nos blocos mágicos digitando as teclas para subir as vigas de aço, desviar dos barris do Donkey Kong e salvar a princesa!',
+          objective: 'Pular nos blocos mágicos digitando as teclas para subir as vigas de aço, desviar dos barris do Guardião da Torre e resgatar o reino!',
           howToPlay: 'Digite as teclas indicadas nos blocos dourados [ ? ] para pular, coletar moedas de ouro e escalar até o topo!',
           fingers: 'Mãos prontas para teclar letras e setas com agilidade arcade.',
           pedagogicalTip: 'Jogos de plataforma 2D aumentam os reflexos bilaterais e a localização espacial no teclado.',

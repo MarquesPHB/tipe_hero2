@@ -256,7 +256,7 @@ class SoundEngine {
   }
 
   /**
-   * Som crocante de estouro de bolha (Bubble Pop / Tetris de Letras)
+   * Som crocante de estouro de bolha (Bubble Pop / Chuva de Letras)
    */
   public bubblePop(pitchMod = 1) {
     const ctx = this.getContext();

@@ -20,7 +20,7 @@ const ROBOT_PARTS: RobotPart[] = [
   {
     id: 1,
     name: 'Esteira de Tração Blindada',
-    type: 'Base Lego',
+    type: 'Base Modular',
     codeWord: 'BASE',
     color: '#334155',
     description: 'Chassi reforçado com rodas e esteiras para terrenos difíceis.',
@@ -39,7 +39,7 @@ const ROBOT_PARTS: RobotPart[] = [
     type: 'Tronco Modular',
     codeWord: 'ROBO',
     color: '#3b82f6',
-    description: 'Armadura peitoral com encaixes de pinos Lego reforçados.',
+    description: 'Armadura peitoral com encaixes reforçados de alta precisão.',
   },
   {
     id: 4,
@@ -129,7 +129,7 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-black text-cyan-300 tracking-wider font-mono">
-              OFICINA LEGO & MONTAGEM DE ROBÔ 16-BIT
+              OFICINA DE MONTAGEM & ROBÔ TITÃ 16-BIT
             </h3>
             <p className="text-xs text-slate-300">
               Progresso de Montagem: {assembledParts.length} de {ROBOT_PARTS.length} peças
@@ -157,7 +157,7 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
 
       {/* Bancada 2D de Montagem do Robô (SVG Ilustrado) */}
       <div className="relative w-full h-[360px] bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-2xl snes-bezel flex items-center justify-center">
-        {/* Grade de Pinos Lego de Fundo */}
+        {/* Grade de Pinos de Encaixe de Fundo */}
         <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_2px,transparent_2px)] [background-size:20px_20px] opacity-15" />
 
         <svg viewBox="0 0 500 360" className="w-full h-full">
@@ -174,7 +174,7 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
               <circle cx="200" cy="287" r="10" fill="#64748b" />
               <circle cx="250" cy="287" r="10" fill="#64748b" />
               <circle cx="300" cy="287" r="10" fill="#64748b" />
-              {/* Pinos Lego no topo da base */}
+              {/* Pinos no topo da base */}
               <rect x="210" y="264" width="12" height="6" fill="#475569" rx="2" />
               <rect x="244" y="264" width="12" height="6" fill="#475569" rx="2" />
               <rect x="278" y="264" width="12" height="6" fill="#475569" rx="2" />
@@ -201,7 +201,7 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
                 strokeWidth="4"
               />
               <rect x="235" y="180" width="30" height="20" rx="3" fill="#1e3a8a" stroke="#93c5fd" strokeWidth="1" />
-              {/* Pinos Lego de encaixe nos ombros */}
+              {/* Pinos de encaixe nos ombros */}
               <circle cx="205" cy="180" r="5" fill="#f59e0b" />
               <circle cx="295" cy="180" r="5" fill="#f59e0b" />
             </g>
@@ -227,9 +227,9 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
             <g className="animate-in fade-in zoom-in duration-300">
               {/* Pescoço */}
               <rect x="242" y="155" width="16" height="15" fill="#475569" />
-              {/* Cabeça Bloco Lego */}
+              {/* Cabeça Bloco Modular */}
               <rect x="215" y="90" width="70" height="65" rx="10" fill="#059669" stroke="#34d399" strokeWidth="4" />
-              {/* Pinos de Lego no topo da cabeça */}
+              {/* Pinos de montagem no topo da cabeça */}
               <rect x="225" y="80" width="14" height="10" fill="#10b981" rx="2" />
               <rect x="261" y="80" width="14" height="10" fill="#10b981" rx="2" />
               {/* Antena Cyber */}
@@ -259,7 +259,7 @@ export const RobotLegoActivity: React.FC<RobotLegoActivityProps> = ({ onComplete
             </div>
             <h3 className="text-2xl font-black text-white">ROBÔ TITÃ 100% OPERACIONAL!</h3>
             <p className="text-xs text-slate-300 max-w-md">
-              Todas as peças Lego foram montadas e calibradas com sucesso através da sua digitação impecável!
+              Todas as peças e módulos foram montados e calibrados com sucesso através da sua digitação impecável!
             </p>
             <button
               onClick={handleFinish}
