@@ -271,7 +271,7 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
         </div>
 
         {/* Diálogo Pedagógico do NPC da Ilha */}
-        {!activeActivityIdx && (
+        {activeActivityIdx === null && (
           <div className="my-4 bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex items-center space-x-4 shadow-sm">
             <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl shrink-0 shadow">
               {island.npcAvatar}
@@ -281,7 +281,7 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
                 {island.npcName} · <span className="text-slate-400 font-normal">{island.npcTitle}</span>
               </div>
               <p className="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed">
-                "{island.goal} Pratique as 8 atividades na sequência didática para consolidar sua memória muscular!"
+                "{island.goal} Pratique as {island.activities.length} atividades na sequência didática para consolidar sua memória muscular!"
               </p>
             </div>
           </div>

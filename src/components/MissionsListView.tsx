@@ -97,7 +97,7 @@ export const MissionsListView: React.FC<MissionsListViewProps> = ({
                     <div className="flex items-center space-x-4 mt-2 text-[11px] text-slate-400">
                       <span>👤 Mentor: <b className="text-slate-200">{island.npcName}</b> ({island.npcTitle})</span>
                       <span>•</span>
-                      <span>🎯 8 Atividades Didáticas ({doneCount}/8 feitas)</span>
+                      <span>🎯 {island.activities.length} Atividades Didáticas ({doneCount}/{island.activities.length} feitas)</span>
                     </div>
                   </div>
                 </div>
