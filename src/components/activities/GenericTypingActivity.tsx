@@ -12,7 +12,14 @@ interface GenericTypingActivityProps {
   suggestedFinger?: string;
   pedagogicalTip?: string;
   initialMode?: 'classic' | 'bubbles';
-  onComplete: (score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }) => void;
+  onComplete: (score: {
+    wpm: number;
+    accuracy: number;
+    errors: number;
+    rewardXp: number;
+    rewardCoins: number;
+    missedKeys?: string[];
+  }) => void;
 }
 
 export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
@@ -29,6 +36,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
   const [errors, setErrors] = useState(0);
+  const [missedKeys, setMissedKeys] = useState<string[]>([]);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [isDone, setIsDone] = useState(false);
 
@@ -70,12 +78,16 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
       } else {
         sounds.errorThud();
         setErrors((prev) => prev + 1);
+        const expected = targetText[idx]?.toLowerCase();
+        if (expected) {
+          setMissedKeys((prev) => [...prev, expected]);
+        }
       }
     }
 
     setTyped(val);
 
-    // Métricas
+    // Métricas de velocidade por minuto (WPM e Toques por Minuto)
     const elapsedMinutes = Math.max(0.01, (Date.now() - (startTime || Date.now())) / 60000);
     const words = val.length / 5;
     const currentWpm = Math.round(words / elapsedMinutes);
@@ -98,6 +110,7 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
           errors,
           rewardXp: 55,
           rewardCoins: 45,
+          missedKeys,
         });
       }, 1200);
     }
@@ -183,9 +196,10 @@ export const GenericTypingActivity: React.FC<GenericTypingActivityProps> = ({
       <div className="flex items-center justify-between bg-slate-900/95 border-2 border-slate-700/80 rounded-2xl px-4 py-2.5 shadow-lg">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <Gauge className="w-4 h-4 text-sky-400" />
+            <Gauge className="w-4 h-4 text-sky-400 shrink-0" />
             <span className="text-xs text-slate-300">
-              Velocidade: <b className="text-sky-400 font-mono text-sm">{wpm} WPM</b>
+              Velocidade: <b className="text-sky-400 font-mono text-sm">{wpm} WPM</b>{' '}
+              <span className="text-[10px] text-slate-400 font-mono">({Math.round(wpm * 5)} TPM)</span>
             </span>
           </div>
           <div className="flex items-center space-x-2">

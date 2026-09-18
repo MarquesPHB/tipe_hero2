@@ -14,6 +14,7 @@ import { AvatarEditorModal } from './components/AvatarEditorModal';
 import { HelpModal } from './components/HelpModal';
 import { CertificateModal } from './components/activities/CertificateModal';
 import { GenericTypingActivity } from './components/activities/GenericTypingActivity';
+import { DiagnosticView } from './components/DiagnosticView';
 import { Sparkles, Compass, MapPin, ChevronRight, BookOpen, Volume2, Minimize2 } from 'lucide-react';
 
 const STORAGE_KEYS = {
@@ -114,8 +115,9 @@ export const App: React.FC = () => {
   });
 
   // 2. Estados de Navegação e Modais
-  const [currentTab, setCurrentTab] = useState<'world' | 'missions' | 'shop' | 'profile' | 'settings'>('world');
+  const [currentTab, setCurrentTab] = useState<'world' | 'missions' | 'diagnostic' | 'shop' | 'profile' | 'settings'>('world');
   const [activeIslandIdx, setActiveIslandIdx] = useState<number | null>(null);
+  const [targetActivityIdx, setTargetActivityIdx] = useState<number | null>(null);
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -153,6 +155,7 @@ export const App: React.FC = () => {
 
       if (e.key === 'Escape') {
         setActiveIslandIdx(null);
+        setTargetActivityIdx(null);
         setShowAvatarEditor(false);
         setShowShop(false);
         setShowHelp(false);
@@ -172,7 +175,14 @@ export const App: React.FC = () => {
   // Handler de Conclusão de Atividade
   const handleActivityComplete = (
     activityIdx: number,
-    score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }
+    score: {
+      wpm: number;
+      accuracy: number;
+      errors: number;
+      rewardXp: number;
+      rewardCoins: number;
+      missedKeys?: string[];
+    }
   ) => {
     if (activeIslandIdx === null) return;
 
@@ -200,6 +210,29 @@ export const App: React.FC = () => {
         completed.add(activeIslandIdx);
       }
 
+      // Atualiza erros por tecla individual
+      const updatedErrors = { ...prev.errors };
+      if (score.missedKeys && score.missedKeys.length > 0) {
+        for (const k of score.missedKeys) {
+          const lowerK = k.toLowerCase();
+          updatedErrors[lowerK] = (updatedErrors[lowerK] || 0) + 1;
+        }
+      }
+
+      // Registra métricas individuais da atividade no exerciseRecords
+      const exerciseKey = `${activeIslandIdx}_${activityIdx}`;
+      const prevRecord = prev.exerciseRecords?.[exerciseKey];
+      const updatedExerciseRecords = {
+        ...(prev.exerciseRecords || {}),
+        [exerciseKey]: {
+          wpm: score.wpm,
+          accuracy: score.accuracy,
+          errors: (prevRecord?.errors || 0) + score.errors,
+          attempts: (prevRecord?.attempts || 0) + 1,
+          lastPlayed: Date.now(),
+        },
+      };
+
       return {
         ...prev,
         xp: newXp,
@@ -208,6 +241,8 @@ export const App: React.FC = () => {
         accuracy: newAcc,
         completedPhases: Array.from(completed),
         historyWpm: history,
+        errors: updatedErrors,
+        exerciseRecords: updatedExerciseRecords,
       };
     });
   };
@@ -460,6 +495,36 @@ export const App: React.FC = () => {
           />
         )}
 
+        {/* ABA: DIAGNÓSTICO DO ALUNO, MÉTRICAS WPM & DIFICULDADES */}
+        {currentTab === 'diagnostic' && (
+          <DiagnosticView
+            stats={stats}
+            difficulty={settings.difficulty}
+            activitiesDoneByIsland={activitiesDoneByIsland}
+            onSelectActivity={(islandId, actIdx) => {
+              setActiveIslandIdx(islandId);
+              setTargetActivityIdx(actIdx);
+            }}
+            onStartCustomKeyDrill={(keys) => {
+              const drill = keys.map((k) => `${k}${k} ${k}a ${k}o`).join(' ');
+              setPracticeErrorText(drill);
+            }}
+            onChangeDifficulty={(d) => setSettings((s) => ({ ...s, difficulty: d }))}
+          />
+        )}
+
+        {/* ABA: LOJA DE ITENS & CUSTOMIZAÇÃO */}
+        {currentTab === 'shop' && (
+          <div className="max-w-4xl mx-auto w-full">
+            <ShopModal
+              stats={stats}
+              avatar={avatar}
+              onBuyItem={handleBuyShopItem}
+              onClose={() => setCurrentTab('world')}
+            />
+          </div>
+        )}
+
         {/* ABA: PERFIL E PROGRESSO */}
         {currentTab === 'profile' && (
           <ProfileView
@@ -468,6 +533,7 @@ export const App: React.FC = () => {
             onOpenAvatarEditor={() => setShowAvatarEditor(true)}
             onPracticeErrors={handleStartPracticeErrors}
             onOpenCertificate={() => setShowCertificate(true)}
+            onOpenDiagnostic={() => setCurrentTab('diagnostic')}
           />
         )}
 
@@ -496,7 +562,11 @@ export const App: React.FC = () => {
           playerWpm={stats.wpm}
           playerAccuracy={stats.accuracy}
           isPresentation={settings.presentationMode}
-          onClose={() => setActiveIslandIdx(null)}
+          initialActivityIdx={targetActivityIdx}
+          onClose={() => {
+            setActiveIslandIdx(null);
+            setTargetActivityIdx(null);
+          }}
           onActivityComplete={handleActivityComplete}
         />
       )}

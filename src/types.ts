@@ -101,6 +101,16 @@ export interface PlayerStats {
   historyWpm: number[];
   inventory: string[];
   playerName: string;
+  exerciseRecords?: Record<
+    string,
+    {
+      wpm: number;
+      accuracy: number;
+      errors: number;
+      attempts: number;
+      lastPlayed?: number;
+    }
+  >;
 }
 
 export interface GameSettings {

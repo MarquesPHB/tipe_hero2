@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IslandDef, ActivityDef } from '../types';
 import { sounds } from '../audio/soundEngine';
 import { speakText } from '../speech/tts';
@@ -40,8 +40,19 @@ interface MissionIslandModalProps {
   playerWpm: number;
   playerAccuracy: number;
   isPresentation?: boolean;
+  initialActivityIdx?: number | null;
   onClose: () => void;
-  onActivityComplete: (activityIdx: number, score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }) => void;
+  onActivityComplete: (
+    activityIdx: number,
+    score: {
+      wpm: number;
+      accuracy: number;
+      errors: number;
+      rewardXp: number;
+      rewardCoins: number;
+      missedKeys?: string[];
+    }
+  ) => void;
 }
 
 export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
@@ -50,11 +61,20 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
   playerWpm,
   playerAccuracy,
   isPresentation = false,
+  initialActivityIdx = null,
   onClose,
   onActivityComplete,
 }) => {
-  const [activeActivityIdx, setActiveActivityIdx] = useState<number | null>(null);
+  const [activeActivityIdx, setActiveActivityIdx] = useState<number | null>(initialActivityIdx);
   const [showCertificate, setShowCertificate] = useState(false);
+
+  useEffect(() => {
+    if (initialActivityIdx !== undefined && initialActivityIdx !== null && island.activities[initialActivityIdx]) {
+      setActiveActivityIdx(initialActivityIdx);
+      const act = island.activities[initialActivityIdx];
+      speakText(`${act.title}. ${act.guide.objective}`);
+    }
+  }, [initialActivityIdx, island]);
 
   const handleStartActivity = (idx: number) => {
     sounds.keyClick();
@@ -63,7 +83,14 @@ export const MissionIslandModal: React.FC<MissionIslandModalProps> = ({
     speakText(`${act.title}. ${act.guide.objective}`);
   };
 
-  const handleFinish = (score: { wpm: number; accuracy: number; errors: number; rewardXp: number; rewardCoins: number }) => {
+  const handleFinish = (score: {
+    wpm: number;
+    accuracy: number;
+    errors: number;
+    rewardXp: number;
+    rewardCoins: number;
+    missedKeys?: string[];
+  }) => {
     if (activeActivityIdx === null) return;
     onActivityComplete(activeActivityIdx, score);
     setActiveActivityIdx(null);

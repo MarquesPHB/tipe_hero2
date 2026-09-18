@@ -29,14 +29,31 @@ export interface RecommendedActivity {
   priority: 'alta' | 'media';
 }
 
+export interface DifficultExerciseInfo {
+  islandId: number;
+  activityIdx: number;
+  activityId: string;
+  activityTitle: string;
+  islandName: string;
+  islandIcon: string;
+  reason: string;
+  severity: 'alta' | 'media';
+  recordedWpm?: number;
+  recordedAccuracy?: number;
+  recordedErrors?: number;
+  criticalKeys?: string[];
+}
+
 export interface DiagnosticReport {
   overallAccuracy: number;
   wpm: number;
+  cpm: number; // toques por minuto / caracteres por minuto
   totalErrorsMapped: number;
   masteryLevel: string;
   domains: SkillDomain[];
   weakKeys: WeakKeyInfo[];
   recommendations: RecommendedActivity[];
+  difficultExercises: DifficultExerciseInfo[]; // Identificação dos exercícios com maior dificuldade para o aluno
   pedagogicalAdvice: string;
 }
 
@@ -288,6 +305,135 @@ export function generateLearningDiagnostic(
     });
   }
 
+  // Identificação detalhada dos exercícios que o aluno tem mais dificuldade
+  const difficultExercises: DifficultExerciseInfo[] = [];
+
+  // 1. Exercícios registrados com histórico de baixa precisão, erros ou ritmo lento
+  if (stats.exerciseRecords) {
+    for (const [key, record] of Object.entries(stats.exerciseRecords)) {
+      const [islandIdStr, actIdxStr] = key.split('_');
+      const islandId = parseInt(islandIdStr, 10);
+      const activityIdx = parseInt(actIdxStr, 10);
+      const island = ISLANDS[islandId];
+      const activity = island?.activities[activityIdx];
+
+      if (island && activity) {
+        const isLowAcc = record.accuracy < 88;
+        const isHighErr = record.errors >= 2;
+        const isSlow = record.wpm > 0 && record.wpm < 22;
+
+        if (isLowAcc || isHighErr || isSlow) {
+          let reason = '';
+          if (isLowAcc && isHighErr) {
+            reason = `Precisão de ${record.accuracy}% com ${record.errors} erro(s) registrados na atividade.`;
+          } else if (isLowAcc) {
+            reason = `Precisão de ${record.accuracy}% (abaixo da meta pedagógica de 90%).`;
+          } else if (isHighErr) {
+            reason = `${record.errors} erro(s) registrados durante a execução do exercício.`;
+          } else {
+            reason = `Ritmo de ${record.wpm} WPM nesta lição (abaixo da média esperada).`;
+          }
+
+          difficultExercises.push({
+            islandId,
+            activityIdx,
+            activityId: activity.id,
+            activityTitle: activity.title,
+            islandName: island.name,
+            islandIcon: island.icon,
+            reason,
+            severity: record.accuracy < 80 || record.errors >= 4 ? 'alta' : 'media',
+            recordedWpm: record.wpm,
+            recordedAccuracy: record.accuracy,
+            recordedErrors: record.errors,
+          });
+        }
+      }
+    }
+  }
+
+  // 2. Exercícios do currículo que contêm as teclas que o aluno mais erra
+  const topWeakKeysList = weakKeys.slice(0, 4).map((k) => k.key.toLowerCase());
+  if (topWeakKeysList.length > 0) {
+    for (let i = 0; i < ISLANDS.length; i++) {
+      const isl = ISLANDS[i];
+      for (let j = 0; j < isl.activities.length; j++) {
+        const act = isl.activities[j];
+        const alreadyListed = difficultExercises.some(
+          (d) => d.islandId === i && d.activityIdx === j
+        );
+        if (alreadyListed) continue;
+
+        if (act.targetText) {
+          const lowerText = act.targetText.toLowerCase();
+          const matchedKeys = topWeakKeysList.filter((k) => lowerText.includes(k));
+          if (matchedKeys.length > 0) {
+            difficultExercises.push({
+              islandId: i,
+              activityIdx: j,
+              activityId: act.id,
+              activityTitle: act.title,
+              islandName: isl.name,
+              islandIcon: isl.icon,
+              reason: `Contém as teclas com maior taxa de erro do aluno: ${matchedKeys.map((k) => k.toUpperCase()).join(', ')}.`,
+              severity: matchedKeys.length >= 2 ? 'alta' : 'media',
+              criticalKeys: matchedKeys,
+            });
+          }
+        }
+
+        if (difficultExercises.length >= 6) break;
+      }
+      if (difficultExercises.length >= 6) break;
+    }
+  }
+
+  // 3. Fallback inteligente para garantir identificação didática
+  if (difficultExercises.length < 3) {
+    const fallbackList: DifficultExerciseInfo[] = [
+      {
+        islandId: 3,
+        activityIdx: 1,
+        activityId: 'picos-2-u-o',
+        activityTitle: '2. Escalada: Vogais U e O',
+        islandName: 'Picos da Linha Superior',
+        islandIcon: '⛰️',
+        reason: 'Extensão dos dedos anelares e indicadores para a fileira superior exige coordenação.',
+        severity: 'alta',
+        criticalKeys: ['u', 'o'],
+      },
+      {
+        islandId: 4,
+        activityIdx: 0,
+        activityId: 'sub-1-c-v',
+        activityTitle: '1. Mergulho: Letras C e V',
+        islandName: 'Cavernas da Linha Inferior',
+        islandIcon: '💎',
+        reason: 'Descida dos dedos para a linha inferior frequentemente apresenta hesitações posturais.',
+        severity: 'media',
+        criticalKeys: ['c', 'v'],
+      },
+      {
+        islandId: 6,
+        activityIdx: 0,
+        activityId: 'templo-1-agudo',
+        activityTitle: '1. O Segredo do Acento Agudo (´)',
+        islandName: 'Templo dos Acentos e Cedilha',
+        islandIcon: '🏛️',
+        reason: 'Combinação em dois tempos (acento + vogal) é uma das maiores fontes de dúvidas.',
+        severity: 'alta',
+        criticalKeys: ['´', 'ç'],
+      },
+    ];
+
+    for (const fb of fallbackList) {
+      if (!difficultExercises.some((d) => d.islandId === fb.islandId && d.activityIdx === fb.activityIdx)) {
+        difficultExercises.push(fb);
+      }
+      if (difficultExercises.length >= 4) break;
+    }
+  }
+
   // Nível geral de maestria
   let masteryLevel = 'Iniciante Curioso 🌱';
   if (stats.wpm >= 40 && stats.accuracy >= 94) {
@@ -305,14 +451,19 @@ export function generateLearningDiagnostic(
     pedagogicalAdvice = 'Sua precisão está impecável! Agora você pode tentar o Modo Difícil no menu superior para desafiar sua velocidade contra os pilotos Nitro!';
   }
 
+  const currentWpm = stats.wpm || 24;
+  const currentCpm = Math.round(currentWpm * 5);
+
   return {
     overallAccuracy: stats.accuracy || 92,
-    wpm: stats.wpm || 24,
+    wpm: currentWpm,
+    cpm: currentCpm,
     totalErrorsMapped: totalErrors,
     masteryLevel,
     domains,
     weakKeys,
     recommendations: recommendations.slice(0, 3),
+    difficultExercises: difficultExercises.slice(0, 5),
     pedagogicalAdvice,
   };
 }

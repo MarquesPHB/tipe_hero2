@@ -2,10 +2,25 @@ import React from 'react';
 import { AvatarConfig, Difficulty, FontSize, PlayerStats, ThemeMode } from '../types';
 import { AvatarDisplay } from './AvatarDisplay';
 import { sounds } from '../audio/soundEngine';
-import { Volume2, VolumeX, Sparkles, Gem, Coins, Trophy, Award, Sliders, Sun, Moon, Maximize2, Minimize2 } from 'lucide-react';
+import {
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Gem,
+  Coins,
+  Trophy,
+  Award,
+  Sliders,
+  Sun,
+  Moon,
+  Maximize2,
+  Minimize2,
+  Gauge,
+  Brain,
+} from 'lucide-react';
 
 interface TopBarProps {
-  currentTab: 'world' | 'missions' | 'shop' | 'profile' | 'settings';
+  currentTab: 'world' | 'missions' | 'diagnostic' | 'shop' | 'profile' | 'settings';
   stats: PlayerStats;
   avatar: AvatarConfig;
   difficulty: Difficulty;
@@ -13,7 +28,7 @@ interface TopBarProps {
   fontSize: FontSize;
   themeMode: ThemeMode;
   presentationMode: boolean;
-  onTabChange: (tab: 'world' | 'missions' | 'shop' | 'profile' | 'settings') => void;
+  onTabChange: (tab: 'world' | 'missions' | 'diagnostic' | 'shop' | 'profile' | 'settings') => void;
   onDifficultyChange: (diff: Difficulty) => void;
   onToggleSound: () => void;
   onOpenAvatarEditor: () => void;
@@ -64,6 +79,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           {[
             { id: 'world', label: 'Mundo', icon: '🏠' },
             { id: 'missions', label: 'Missões', icon: '🗺️' },
+            { id: 'diagnostic', label: 'Diagnóstico', icon: '📊' },
             { id: 'shop', label: 'Loja', icon: '🎒' },
             { id: 'profile', label: 'Perfil', icon: '🧑' },
             { id: 'settings', label: 'Ajustes', icon: '⚙️' },
@@ -72,7 +88,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               key={tab.id}
               onClick={() => {
                 sounds.keyClick();
-                onTabChange(tab.id as 'world' | 'missions' | 'shop' | 'profile' | 'settings');
+                onTabChange(tab.id as 'world' | 'missions' | 'diagnostic' | 'shop' | 'profile' | 'settings');
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 ${
                 currentTab === tab.id
@@ -199,6 +215,20 @@ export const TopBar: React.FC<TopBarProps> = ({
             title={soundEnabled ? 'Sons de jogo ativados' : 'Sons desativados'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
+          {/* Métrica de Velocidade WPM (Palavras por Minuto) com link direto para o Diagnóstico */}
+          <button
+            onClick={() => {
+              sounds.keyClick();
+              onTabChange('diagnostic');
+            }}
+            className="hidden sm:flex items-center space-x-1.5 bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:bg-slate-850 px-2.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95"
+            title="Métrica de Digitação: Palavras por Minuto (Clique para abrir Diagnóstico de Dificuldades)"
+          >
+            <Gauge className="w-3.5 h-3.5 text-sky-400" />
+            <span className="font-mono text-sky-400 font-black">{stats.wpm}</span>
+            <span className="text-[10px] text-slate-400">WPM</span>
           </button>
 
           {/* Moedas e Gemas */}

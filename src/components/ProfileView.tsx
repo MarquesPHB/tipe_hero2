@@ -2,7 +2,7 @@ import React from 'react';
 import { PlayerStats, AvatarConfig } from '../types';
 import { AvatarDisplay } from './AvatarDisplay';
 import { sounds } from '../audio/soundEngine';
-import { Trophy, Zap, Gauge, Coins, Gem, Award, Flame, RotateCcw, Sparkles } from 'lucide-react';
+import { Trophy, Zap, Gauge, Coins, Gem, Award, Flame, RotateCcw, Sparkles, Target, BarChart3 } from 'lucide-react';
 
 interface ProfileViewProps {
   stats: PlayerStats;
@@ -10,6 +10,7 @@ interface ProfileViewProps {
   onOpenAvatarEditor: () => void;
   onPracticeErrors: () => void;
   onOpenCertificate: () => void;
+  onOpenDiagnostic?: () => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -18,6 +19,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onOpenAvatarEditor,
   onPracticeErrors,
   onOpenCertificate,
+  onOpenDiagnostic,
 }) => {
   const completedCount = stats.completedPhases.length;
   const errorEntries = Object.entries(stats.errors)
@@ -61,13 +63,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             Progresso Geral: <b>{completedCount} de 10 ilhas dominadas</b>. Aperfeiçoando o controle motor do mouse, o toque tátil com os 10 dedos e a velocidade no teclado ABNT2.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
             <button
               onClick={onOpenAvatarEditor}
               className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-600 transition"
             >
               Personalizar Roupas e Cabelo
             </button>
+            {onOpenDiagnostic && (
+              <button
+                onClick={onOpenDiagnostic}
+                className="px-4 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-bold text-sky-300 border border-sky-500/40 transition flex items-center space-x-1.5"
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Ver Diagnóstico & WPM</span>
+              </button>
+            )}
             {completedCount >= 10 && (
               <button
                 onClick={onOpenCertificate}

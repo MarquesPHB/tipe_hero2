@@ -85,30 +85,69 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
             </p>
           </div>
 
-          {/* Cards de Métricas */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl text-center min-w-[90px]">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Precisão</span>
-              <span className="text-2xl font-black text-emerald-400 font-mono">
-                {diagnostic.overallAccuracy}%
-              </span>
-              <span className="text-[9px] text-slate-500 block">taxa de acerto</span>
-            </div>
-            <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl text-center min-w-[90px]">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Ritmo</span>
-              <span className="text-2xl font-black text-sky-400 font-mono">
+          {/* Cards de Métricas de Digitação */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
+            <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl text-center min-w-[85px]">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Velocidade</span>
+              <span className="text-xl sm:text-2xl font-black text-sky-400 font-mono">
                 {diagnostic.wpm}
               </span>
               <span className="text-[9px] text-slate-500 block">WPM (ppm)</span>
             </div>
-            <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl text-center min-w-[100px]">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Nível</span>
-              <span className="text-xs font-black text-amber-400 block mt-1 leading-tight">
-                {diagnostic.masteryLevel}
+            <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl text-center min-w-[85px]">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Toques</span>
+              <span className="text-xl sm:text-2xl font-black text-amber-400 font-mono">
+                {diagnostic.cpm}
               </span>
+              <span className="text-[9px] text-slate-500 block">TPM (toques/min)</span>
+            </div>
+            <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl text-center min-w-[85px]">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Precisão</span>
+              <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+                {diagnostic.overallAccuracy}%
+              </span>
+              <span className="text-[9px] text-slate-500 block">taxa de acerto</span>
+            </div>
+            <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl text-center min-w-[85px]">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Erros</span>
+              <span className="text-xl sm:text-2xl font-black text-rose-400 font-mono">
+                {diagnostic.totalErrorsMapped}
+              </span>
+              <span className="text-[9px] text-slate-500 block">teclas críticas</span>
             </div>
           </div>
         </div>
+
+        {/* Histórico Visual de Velocidade WPM */}
+        {stats.historyWpm && stats.historyWpm.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 text-xs text-slate-300">
+              <TrendingUp className="w-4 h-4 text-sky-400" />
+              <span className="font-bold">Evolução do Ritmo (Últimas Sessões):</span>
+            </div>
+            <div className="flex items-end gap-1.5 h-10 bg-slate-950/70 px-3 py-1 rounded-xl border border-slate-800">
+              {stats.historyWpm.slice(-10).map((histWpm, idx) => {
+                const maxWpm = Math.max(50, ...stats.historyWpm);
+                const barHeightPercent = Math.max(20, Math.round((histWpm / maxWpm) * 100));
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-col items-center group relative cursor-pointer"
+                    title={`Sessão ${idx + 1}: ${histWpm} WPM`}
+                  >
+                    <div
+                      className="w-3 bg-gradient-to-t from-sky-600 to-sky-400 rounded-t group-hover:from-amber-400 group-hover:to-yellow-300 transition-all"
+                      style={{ height: `${barHeightPercent}%` }}
+                    />
+                  </div>
+                );
+              })}
+              <span className="text-[10px] font-mono text-sky-400 ml-1.5 font-bold self-center">
+                {stats.historyWpm[stats.historyWpm.length - 1]} WPM atual
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Conselho Pedagógico */}
         <div className="mt-5 p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex items-start gap-3">
@@ -128,6 +167,92 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
           >
             <Volume2 className="w-4 h-4" />
           </button>
+        </div>
+      </div>
+
+      {/* SEÇÃO PRINCIPAL: IDENTIFICAÇÃO DE DIFICULDADES DO ALUNO */}
+      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <div className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Target className="w-4 h-4 text-rose-400" />
+              Identificação de Dificuldades do Aluno
+            </div>
+            <h3 className="text-xl font-black text-white mt-0.5">
+              Exercícios com Maior Índice de Dificuldade
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+              Exercícios onde o sistema registrou menor precisão, erros acumulados ou que exigem coordenação motora nas teclas mais desafiadoras para você.
+            </p>
+          </div>
+          <span className="text-xs text-slate-400 shrink-0 hidden md:inline bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+            🎯 Treino focado em superação
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {diagnostic.difficultExercises.map((diff, idx) => (
+            <div
+              key={idx}
+              className={`rounded-2xl border p-4 flex flex-col justify-between transition hover:border-slate-600 bg-slate-950/90 ${
+                diff.severity === 'alta'
+                  ? 'border-rose-500/40 shadow-[0_0_15px_#f43f5e15]'
+                  : 'border-amber-500/30'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">{diff.islandIcon}</span>
+                    <span className="text-[11px] font-bold text-slate-400">{diff.islandName}</span>
+                  </div>
+                  <span
+                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                      diff.severity === 'alta'
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    }`}
+                  >
+                    {diff.severity === 'alta' ? 'Alta Dificuldade' : 'Requer Atenção'}
+                  </span>
+                </div>
+
+                <h4 className="text-sm font-black text-white mt-1 leading-snug">
+                  {diff.activityTitle}
+                </h4>
+
+                <p className="text-xs text-slate-300 mt-2.5 bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 leading-relaxed">
+                  🔍 <b className="text-amber-300">Motivo:</b> {diff.reason}
+                </p>
+
+                {(diff.recordedAccuracy !== undefined || diff.recordedWpm !== undefined) && (
+                  <div className="mt-2.5 flex items-center gap-2">
+                    {diff.recordedAccuracy !== undefined && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">
+                        Precisão: <b className="text-rose-400">{diff.recordedAccuracy}%</b>
+                      </span>
+                    )}
+                    {diff.recordedWpm !== undefined && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">
+                        Ritmo: <b className="text-sky-400">{diff.recordedWpm} WPM</b>
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  sounds.mouseClick();
+                  onSelectActivity(diff.islandId, diff.activityIdx);
+                }}
+                className="mt-4 w-full py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center space-x-1.5 shadow-md active:scale-95"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Superar Esta Dificuldade</span>
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 
