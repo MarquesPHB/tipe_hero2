@@ -297,12 +297,24 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-purple-400">Narração e Leitor de Instruções</span>
-              <button
-                onClick={handleTestVoice}
-                className="px-3 py-1 bg-purple-900/60 hover:bg-purple-800 text-purple-200 rounded-lg border border-purple-600/50 font-bold transition"
-              >
-                🎙️ Testar Voz
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => update('voiceEnabled', !current.voiceEnabled)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                    current.voiceEnabled
+                      ? 'bg-purple-950/60 border-purple-500/50 text-purple-300'
+                      : 'bg-slate-900 border-slate-700 text-slate-400'
+                  }`}
+                >
+                  {current.voiceEnabled ? 'LIGADA' : 'DESLIGADA'}
+                </button>
+                <button
+                  onClick={handleTestVoice}
+                  className="px-3 py-1 bg-purple-900/60 hover:bg-purple-800 text-purple-200 rounded-lg border border-purple-600/50 font-bold transition text-xs"
+                >
+                  🎙️ Testar
+                </button>
+              </div>
             </div>
 
             <div>

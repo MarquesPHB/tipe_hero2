@@ -17,6 +17,8 @@ import {
   Minimize2,
   Gauge,
   Brain,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -25,12 +27,14 @@ interface TopBarProps {
   avatar: AvatarConfig;
   difficulty: Difficulty;
   soundEnabled: boolean;
+  voiceEnabled?: boolean;
   fontSize: FontSize;
   themeMode: ThemeMode;
   presentationMode: boolean;
   onTabChange: (tab: 'world' | 'missions' | 'diagnostic' | 'shop' | 'profile' | 'settings') => void;
   onDifficultyChange: (diff: Difficulty) => void;
   onToggleSound: () => void;
+  onToggleVoice?: () => void;
   onOpenAvatarEditor: () => void;
   onDecreaseFontSize: () => void;
   onIncreaseFontSize: () => void;
@@ -44,12 +48,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   avatar,
   difficulty,
   soundEnabled,
+  voiceEnabled = true,
   fontSize,
   themeMode,
   presentationMode,
   onTabChange,
   onDifficultyChange,
   onToggleSound,
+  onToggleVoice,
   onOpenAvatarEditor,
   onDecreaseFontSize,
   onIncreaseFontSize,
@@ -212,23 +218,62 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ? 'bg-slate-900 border-slate-700 text-sky-400 hover:text-sky-300'
                 : 'bg-slate-900 border-rose-900/50 text-rose-400'
             }`}
-            title={soundEnabled ? 'Sons de jogo ativados' : 'Sons desativados'}
+            title={soundEnabled ? 'Efeitos sonoros ativados (Clique para desligar)' : 'Efeitos sonoros desligados (Clique para ligar)'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
 
-          {/* Métrica de Velocidade WPM (Palavras por Minuto) com link direto para o Diagnóstico */}
+          {/* Voz de Locução Toggle */}
+          {onToggleVoice && (
+            <button
+              onClick={() => {
+                sounds.keyClick();
+                onToggleVoice();
+              }}
+              className={`w-9 h-9 rounded-xl border flex items-center justify-center text-xs transition ${
+                voiceEnabled
+                  ? 'bg-slate-900 border-purple-600/70 text-purple-400 hover:text-purple-300 hover:bg-slate-850'
+                  : 'bg-slate-900 border-rose-900/50 text-rose-400/80 hover:text-rose-300'
+              }`}
+              title={
+                voiceEnabled
+                  ? 'Voz de locução ativada (Clique para desligar)'
+                  : 'Voz de locução desligada (Clique para ligar)'
+              }
+            >
+              {voiceEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+            </button>
+          )}
+
+          {/* Métrica de Velocidade WPM (Palavras por Minuto): clique ativa o diagnóstico e clique novamente desativa e volta à tela inicial */}
           <button
             onClick={() => {
               sounds.keyClick();
-              onTabChange('diagnostic');
+              if (currentTab === 'diagnostic') {
+                onTabChange('world');
+              } else {
+                onTabChange('diagnostic');
+              }
             }}
-            className="hidden sm:flex items-center space-x-1.5 bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:bg-slate-850 px-2.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95"
-            title="Métrica de Digitação: Palavras por Minuto (Clique para abrir Diagnóstico de Dificuldades)"
+            className={`hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 border ${
+              currentTab === 'diagnostic'
+                ? 'bg-sky-500/20 border-sky-400 text-sky-300 shadow-[0_0_12px_#38bdf835]'
+                : 'bg-slate-900 border-slate-800 hover:border-sky-500/50 hover:bg-slate-850 text-slate-200'
+            }`}
+            title={
+              currentTab === 'diagnostic'
+                ? 'Diagnóstico WPM ativado (Clique para desativar e voltar à tela inicial do jogo)'
+                : 'Métrica de Digitação: Palavras por Minuto (Clique para ativar diagnóstico de dificuldades)'
+            }
           >
-            <Gauge className="w-3.5 h-3.5 text-sky-400" />
+            <Gauge className={`w-3.5 h-3.5 ${currentTab === 'diagnostic' ? 'text-sky-300' : 'text-sky-400'}`} />
             <span className="font-mono text-sky-400 font-black">{stats.wpm}</span>
             <span className="text-[10px] text-slate-400">WPM</span>
+            {currentTab === 'diagnostic' && (
+              <span className="text-[9px] bg-sky-400/30 text-sky-200 px-1 py-0.2 rounded font-mono font-normal">
+                ativo
+              </span>
+            )}
           </button>
 
           {/* Moedas e Gemas */}

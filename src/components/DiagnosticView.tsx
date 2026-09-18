@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Flame,
   ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface DiagnosticViewProps {
@@ -25,6 +26,7 @@ interface DiagnosticViewProps {
   onSelectActivity: (islandId: number, activityIdx: number) => void;
   onStartCustomKeyDrill: (keys: string[]) => void;
   onChangeDifficulty: (d: Difficulty) => void;
+  onBackToWorld?: () => void;
 }
 
 export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
@@ -34,6 +36,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
   onSelectActivity,
   onStartCustomKeyDrill,
   onChangeDifficulty,
+  onBackToWorld,
 }) => {
   const diagnostic = generateLearningDiagnostic(stats, activitiesDoneByIsland);
 
@@ -68,7 +71,20 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-1.5">
+              {onBackToWorld && (
+                <button
+                  onClick={() => {
+                    sounds.keyClick();
+                    onBackToWorld();
+                  }}
+                  className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 border border-slate-700 transition flex items-center space-x-1 active:scale-95"
+                  title="Voltar ao mapa inicial do jogo"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Voltar</span>
+                </button>
+              )}
               <span className="text-xs uppercase font-extrabold tracking-wider text-amber-400 flex items-center gap-1.5">
                 <Brain className="w-4 h-4 text-amber-400" />
                 Mapeamento de Dificuldades & Recomendações

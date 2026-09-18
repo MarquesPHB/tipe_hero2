@@ -2,6 +2,25 @@
  * Web Speech API wrapper for Brazilian Portuguese narration.
  */
 
+let globalVoiceEnabled = true;
+
+export function setGlobalVoiceEnabled(enabled: boolean) {
+  globalVoiceEnabled = enabled;
+  if (!enabled && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+export function isGlobalVoiceEnabled(): boolean {
+  return globalVoiceEnabled;
+}
+
+export function stopSpeaking() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
 export function getPtBRVoices(): SpeechSynthesisVoice[] {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return [];
   const list = window.speechSynthesis.getVoices();
@@ -18,7 +37,7 @@ export function speakText(
     pitch?: number;
   } = {}
 ) {
-  if (options.enabled === false) return;
+  if (options.enabled === false || !globalVoiceEnabled) return;
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
   window.speechSynthesis.cancel();

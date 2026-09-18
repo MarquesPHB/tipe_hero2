@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { IslandDef, PlayerStats, AvatarConfig, GameSettings, Difficulty, FontSize } from './types';
 import { ISLANDS } from './data/curriculum';
 import { sounds } from './audio/soundEngine';
-import { speakText } from './speech/tts';
+import { speakText, setGlobalVoiceEnabled, stopSpeaking } from './speech/tts';
 import { TopBar } from './components/TopBar';
 import { WorldCanvas } from './components/WorldCanvas';
 import { MissionIslandModal } from './components/MissionIslandModal';
@@ -371,6 +371,11 @@ export const App: React.FC = () => {
     root.style.fontSize = sizeMap[settings.fontSize] || '16px';
   }, [settings.fontSize]);
 
+  // Sincronização do estado global de locução por voz
+  useEffect(() => {
+    setGlobalVoiceEnabled(settings.voiceEnabled);
+  }, [settings.voiceEnabled]);
+
   const visionClass =
     settings.visionMode === 'mono'
       ? 'grayscale'
@@ -396,13 +401,25 @@ export const App: React.FC = () => {
         avatar={avatar}
         difficulty={settings.difficulty}
         soundEnabled={settings.sound}
+        voiceEnabled={settings.voiceEnabled}
         fontSize={settings.fontSize}
         themeMode={settings.themeMode}
         presentationMode={settings.presentationMode}
         onTabChange={(tab) => {
-          if (tab === 'shop') setShowShop(true);
-          else if (tab === 'settings') setCurrentTab('settings');
-          else setCurrentTab(tab);
+          if (tab === 'world') {
+            setActiveIslandIdx(null);
+            setTargetActivityIdx(null);
+            setShowAvatarEditor(false);
+            setShowShop(false);
+            setShowHelp(false);
+            setCurrentTab('world');
+          } else if (tab === 'shop') {
+            setShowShop(true);
+          } else if (tab === 'settings') {
+            setCurrentTab('settings');
+          } else {
+            setCurrentTab(tab);
+          }
         }}
         onDifficultyChange={(d) => setSettings((s) => ({ ...s, difficulty: d }))}
         onToggleSound={() => {
@@ -410,6 +427,20 @@ export const App: React.FC = () => {
             const next = !s.sound;
             if (next) sounds.coin();
             return { ...s, sound: next };
+          });
+        }}
+        onToggleVoice={() => {
+          setSettings((s) => {
+            const next = !s.voiceEnabled;
+            setGlobalVoiceEnabled(next);
+            if (next) {
+              sounds.coin();
+              speakText('Voz de locução ativada.');
+            } else {
+              sounds.keyClick();
+              stopSpeaking();
+            }
+            return { ...s, voiceEnabled: next };
           });
         }}
         onOpenAvatarEditor={() => setShowAvatarEditor(true)}
@@ -510,6 +541,7 @@ export const App: React.FC = () => {
               setPracticeErrorText(drill);
             }}
             onChangeDifficulty={(d) => setSettings((s) => ({ ...s, difficulty: d }))}
+            onBackToWorld={() => setCurrentTab('world')}
           />
         )}
 
